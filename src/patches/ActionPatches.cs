@@ -1544,7 +1544,7 @@ namespace H3MP.Patches
 
             bool applied0 = false;
             bool applied1 = false;
-            bool skippedFirstDir = false;
+            int skippedDirCount = 0;
             for (int i = 0; i < instructionList.Count; ++i)
             {
                 CodeInstruction instruction = instructionList[i];
@@ -1556,14 +1556,14 @@ namespace H3MP.Patches
 
                 if (instruction.opcode == OpCodes.Callvirt && instruction.operand.ToString().Contains("get_forward"))
                 {
-                    if (skippedFirstDir)
+                    if (skippedDirCount == 2)
                     {
                         instructionList.InsertRange(i + 1, toInsert1);
                         applied1 = true;
                     }
                     else
                     {
-                        skippedFirstDir = true;
+                        ++skippedDirCount;
                     }
                 }
             }
