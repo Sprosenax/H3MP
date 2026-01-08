@@ -1768,7 +1768,7 @@ namespace H3MP
                 TNHMenuPages[2].SetActive(false);
 
                 // Handle joining instance success/fail
-                if (SetTNHInstance(GameManager.TNHInstances[TNHHostedInstance]))
+                if (Instance(GameManager.TNHInstances[TNHHostedInstance]))
                 {
                     TNHMenuPages[4].SetActive(true);
 
@@ -2478,84 +2478,98 @@ namespace H3MP
             }
         }
 
-        private static bool SetTNHInstance(TNHInstance instance)
+private static bool SetTNHInstance(TNHInstance instance)
+{
+    if (currentTNHUIManager != null)
+    {
+        currentTNHUIManager.SetOBS_Progression(instance.progressionTypeSetting);
+        currentTNHUIManager.SetOBS_EquipmentMode(instance.equipmentModeSetting);
+        currentTNHUIManager.SetOBS_TargetMode(instance.targetModeSetting);
+        currentTNHUIManager.SetOBS_HealthMode(instance.healthModeSetting);
+        currentTNHUIManager.SetOBS_RunSeed(instance.TNHSeed);
+        currentTNHUIManager.SetOBS_AIDifficulty(instance.AIDifficultyModifier);
+        currentTNHUIManager.SetOBS_AIRadarMode(instance.radarModeModifier);
+        currentTNHUIManager.SetOBS_HealthMult(instance.healthMult);
+        currentTNHUIManager.SetOBS_ItemSpawner(instance.itemSpawnerMode);
+        currentTNHUIManager.SetOBS_Backpack(instance.backpackMode);
+        currentTNHUIManager.SetOBS_SosiggunShakeReloading(instance.sosiggunShakeReloading);
+        
+        // Find level
+        bool found = false;
+        for (int i = 0; i < Mod.currentTNHUIManager.Levels.Count; ++i)
         {
-            if (currentTNHUIManager != null)
+            if (Mod.currentTNHUIManager.Levels[i].LevelID.Equals(instance.levelID))
             {
-                currentTNHUIManager.SetOBS_Progression(instance.progressionTypeSetting);
-                currentTNHUIManager.SetOBS_EquipmentMode(instance.equipmentModeSetting);
-                currentTNHUIManager.SetOBS_TargetMode(instance.targetModeSetting);
-                currentTNHUIManager.SetOBS_HealthMode(instance.healthModeSetting);
-                currentTNHUIManager.SetOBS_RunSeed(instance.TNHSeed);
-                currentTNHUIManager.SetOBS_AIDifficulty(instance.AIDifficultyModifier);
-                currentTNHUIManager.SetOBS_AIRadarMode(instance.radarModeModifier);
-                currentTNHUIManager.SetOBS_HealthMult(instance.healthMult);
-                currentTNHUIManager.SetOBS_ItemSpawner(instance.itemSpawnerMode);
-                currentTNHUIManager.SetOBS_Backpack(instance.backpackMode);
-                currentTNHUIManager.SetOBS_SosiggunShakeReloading(instance.sosiggunShakeReloading);
-
-                // Find level
-                bool found = false;
-                for (int i = 0; i < Mod.currentTNHUIManager.Levels.Count; ++i)
+                found = true;
+                Mod.currentTNHUIManager.m_currentLevelIndex = i;
+                Mod.currentTNHUIManager.CurLevelID = instance.levelID;
+                Mod.currentTNHUIManager.UpdateLevelSelectDisplayAndLoader();
+                Mod.currentTNHUIManager.UpdateTableBasedOnOptions();
+                Mod.currentTNHUIManager.PlayButtonSound(2);
+                
+                // NULL CHECK ADDED HERE
+                if (Mod.currentTNHSceneLoader != null)
                 {
-                    if (Mod.currentTNHUIManager.Levels[i].LevelID.Equals(instance.levelID))
-                    {
-                        found = true;
-
-                        Mod.currentTNHUIManager.m_currentLevelIndex = i;
-                        Mod.currentTNHUIManager.CurLevelID = instance.levelID;
-                        Mod.currentTNHUIManager.UpdateLevelSelectDisplayAndLoader();
-                        Mod.currentTNHUIManager.UpdateTableBasedOnOptions();
-                        Mod.currentTNHUIManager.PlayButtonSound(2);
-                        Mod.currentTNHSceneLoader.gameObject.SetActive(true);
-                        break;
-                    }
-                }
-                if (!found)
-                {
-                    Mod.currentTNHSceneLoader.gameObject.SetActive(false);
-                    Mod.LogError("Missing TNH level: " + instance.levelID + "! Make sure you have it installed.");
-                }
-            }
-
-            GameManager.SetInstance(instance.instance);
-
-            TNHInstanceTitle.text = "Instance " + instance.instance;
-
-            if (currentTNHInstancePlayers == null)
-            {
-                currentTNHInstancePlayers = new Dictionary<int, GameObject>();
-            }
-            else
-            {
-                foreach (KeyValuePair<int, GameObject> entry in currentTNHInstancePlayers)
-                {
-                    Destroy(entry.Value);
-                }
-            }
-            currentTNHInstancePlayers.Clear();
-
-            // Populate player list
-            for (int i = 0; i < instance.playerIDs.Count; ++i)
-            {
-                GameObject newPlayer = Instantiate<GameObject>(TNHPlayerPrefab, TNHPlayerList.transform);
-                if (GameManager.players.ContainsKey(instance.playerIDs[i]))
-                {
-                    newPlayer.transform.GetChild(0).GetComponent<Text>().text = GameManager.players[instance.playerIDs[i]].username + (i == 0 ? " (Host)" : "");
+                    Mod.currentTNHSceneLoader.gameObject.SetActive(true);
                 }
                 else
                 {
-                    newPlayer.transform.GetChild(0).GetComponent<Text>().text = config["Username"].ToString() + (i == 0 ? " (Host)" : "");
+                    Mod.LogWarning("currentTNHSceneLoader is null - H3VR update may have changed TNH initialization");
                 }
-                newPlayer.SetActive(true);
-
-                currentTNHInstancePlayers.Add(instance.playerIDs[i], newPlayer);
+                break;
             }
-
-            currentTNHInstance = instance;
-
-            return true;
         }
+        if (!found)
+        {
+            // NULL CHECK ADDED HERE
+            if (Mod.currentTNHSceneLoader != null)
+            {
+                Mod.currentTNHSceneLoader.gameObject.SetActive(false);
+            }
+            Mod.LogError("Missing TNH level: " + instance.levelID + "! Make sure you have it installed.");
+        }
+    }
+    
+    GameManager.SetInstance(instance.instance);
+    
+    // NULL CHECK ADDED HERE
+    if (TNHInstanceTitle != null)
+    {
+        TNHInstanceTitle.text = "Instance " + instance.instance;
+    }
+    
+    if (currentTNHInstancePlayers == null)
+    {
+        currentTNHInstancePlayers = new Dictionary<int, GameObject>();
+    }
+    else
+    {
+        foreach (KeyValuePair<int, GameObject> entry in currentTNHInstancePlayers)
+        {
+            Destroy(entry.Value);
+        }
+    }
+    currentTNHInstancePlayers.Clear();
+    
+    // Populate player list
+    for (int i = 0; i < instance.playerIDs.Count; ++i)
+    {
+        GameObject newPlayer = Instantiate<GameObject>(TNHPlayerPrefab, TNHPlayerList.transform);
+        if (GameManager.players.ContainsKey(instance.playerIDs[i]))
+        {
+            newPlayer.transform.GetChild(0).GetComponent<Text>().text = GameManager.players[instance.playerIDs[i]].username + (i == 0 ? " (Host)" : "");
+        }
+        else
+        {
+            newPlayer.transform.GetChild(0).GetComponent<Text>().text = config["Username"].ToString() + (i == 0 ? " (Host)" : "");
+        }
+        newPlayer.SetActive(true);
+        currentTNHInstancePlayers.Add(instance.playerIDs[i], newPlayer);
+    }
+    
+    currentTNHInstance = instance;
+    return true;
+}
 
         public static void CreateManagerObject(bool host = false)
         {
