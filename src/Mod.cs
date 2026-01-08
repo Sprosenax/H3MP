@@ -1768,8 +1768,7 @@ namespace H3MP
                 TNHMenuPages[2].SetActive(false);
 
                 // Handle joining instance success/fail
-                if (Instance(GameManager.TNHInstances[TNHHostedInstance]))
-                {
+if (SetTNHInstance(GameManager.TNHInstances[TNHHostedInstance]))                {
                     TNHMenuPages[4].SetActive(true);
 
                     TNHStatusText.text = "Client in TNH game";
