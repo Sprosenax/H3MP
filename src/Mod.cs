@@ -1175,9 +1175,44 @@ namespace H3MP
             currentButton.MaxPointingRange = 5;
             currentButton.Button.onClick.AddListener(OnTNHRequestHostWaitingCancelClicked);
 
-            // Get ref to the UI Manager
-            Mod.currentTNHUIManager = GameObject.FindObjectOfType<TNH_UIManager>();
-            Mod.currentTNHSceneLoader = GameObject.FindObjectOfType<SceneLoader>();
+// Get ref to the UI Manager
+Mod.currentTNHUIManager = GameObject.FindObjectOfType<TNH_UIManager>();
+Mod.currentTNHSceneLoader = GameObject.FindObjectOfType<SceneLoader>();
+
+// Debug logging to see what we found
+Mod.LogInfo($"TNH Scene Initialization:");
+Mod.LogInfo($"  currentTNHUIManager: {Mod.currentTNHUIManager != null}");
+Mod.LogInfo($"  currentTNHSceneLoader: {Mod.currentTNHSceneLoader != null}");
+
+// If SceneLoader is null, try alternative methods to find it
+if (Mod.currentTNHSceneLoader == null)
+{
+    Mod.LogWarning("SceneLoader not found via FindObjectOfType, searching alternatives...");
+    
+    // Try finding it as a child of the UI Manager
+    if (Mod.currentTNHUIManager != null)
+    {
+        Mod.currentTNHSceneLoader = Mod.currentTNHUIManager.GetComponentInChildren<SceneLoader>();
+        Mod.LogInfo($"  Found via GetComponentInChildren: {Mod.currentTNHSceneLoader != null}");
+    }
+    
+    // Try finding all SceneLoaders in the scene
+    if (Mod.currentTNHSceneLoader == null)
+    {
+        SceneLoader[] allLoaders = GameObject.FindObjectsOfType<SceneLoader>();
+        Mod.LogInfo($"  Total SceneLoaders in scene: {allLoaders.Length}");
+        if (allLoaders.Length > 0)
+        {
+            Mod.currentTNHSceneLoader = allLoaders[0];
+            Mod.LogInfo($"  Using first SceneLoader found");
+        }
+    }
+}
+
+if (Mod.currentTNHSceneLoader == null)
+{
+    Mod.LogError("CRITICAL: Could not find SceneLoader in TNH scene! This may cause synchronization issues.");
+}
 
             // If already in a TNH instance, which could be the case if we are coming back from being in game
             if (currentTNHInstance != null)
