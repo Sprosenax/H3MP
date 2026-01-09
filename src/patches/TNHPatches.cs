@@ -1980,7 +1980,6 @@ namespace H3MP.Patches
                 Mod.TNHStartEquipButton.transform.GetChild(0).GetComponent<FVRPointableButton>().Button.onClick.AddListener(Mod.OnTNHSpawnStartEquipClicked);
             }
 }
-        
         public static void UpdateHostForJoiningPlayer(int joiningPlayerID)
     {
         Mod.LogInfo("UpdateHostForJoiningPlayer called for player " + joiningPlayerID);
@@ -2021,7 +2020,7 @@ namespace H3MP.Patches
         Mod.LogInfo("Player " + joiningPlayerID + " added to host's TNH radar");
     }
         
-        }
+        
 
         static bool InitBeginEquipPrefix()
         {
