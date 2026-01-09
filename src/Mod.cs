@@ -1178,6 +1178,14 @@ namespace H3MP
 // Get ref to the UI Manager
 Mod.currentTNHUIManager = GameObject.FindObjectOfType<TNH_UIManager>();
 Mod.currentTNHSceneLoader = GameObject.FindObjectOfType<SceneLoader>();
+Mod.LogInfo("Looking for SceneLoader: " + (Mod.currentTNHSceneLoader != null));
+
+if (Mod.currentTNHSceneLoader == null)
+{
+    // Try alternative methods
+    SceneLoader[] allLoaders = GameObject.FindObjectsOfType<SceneLoader>();
+    Mod.LogInfo("Total SceneLoaders found: " + allLoaders.Length);
+}
 
 // Debug logging to see what we found
 Mod.LogInfo($"TNH Scene Initialization:");
