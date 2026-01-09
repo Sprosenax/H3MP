@@ -878,6 +878,14 @@ namespace H3MP
 
                     Mod.currentTNHInstancePlayers.Add(playerID, newPlayerElement);
                 }
+            
+                // Update host's TNH state for this joining player
+    if (Mod.currentTNHInstance != null && 
+        Mod.currentTNHInstance.instance == instance && 
+        Mod.currentTNHInstance.manager != null)
+    {
+        TNH_ManagerPatch.UpdateHostForJoiningPlayer(playerID);
+    }   
             }
         }
 
