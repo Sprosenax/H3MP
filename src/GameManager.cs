@@ -667,6 +667,14 @@ namespace H3MP
             {
                 playersPresent.Add(playerID);
             }
+        
+            if (Mod.currentTNHInstance != null && 
+        Mod.currentTNHInstance.instance == instance && 
+        Mod.currentTNHInstance.manager != null)
+    {
+        TNH_ManagerPatch.UpdateHostForJoiningPlayer(playerID);
+    }
+        
         }
 
         public static bool UpdatePlayerHidden(PlayerManager player)
