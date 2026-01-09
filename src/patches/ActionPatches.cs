@@ -271,7 +271,7 @@ namespace H3MP.Patches
 
             PatchController.Verify(remoteMissileDetonatePatchOriginal, harmony, false);
             harmony.Patch(remoteMissileDetonatePatchOriginal, new HarmonyMethod(remoteMissileDetonatePatchPrefix));
-
+        
             ++patchIndex; // 16
 
             // StingerMissileExplodePatch
@@ -290,7 +290,7 @@ namespace H3MP.Patches
             PatchController.Verify(sosigWeaponShatterPatchOriginal, harmony, false);
             harmony.Patch(sosigWeaponShatterPatchOriginal, new HarmonyMethod(sosigWeaponShatterPatchPrefix));
 
-            ++patchIndex; // 18
+            ++patchIndex;} // 18
 
 // Patches Sosig.Awake to add TrackedSosig component immediately
 class SosigAwakePatch
