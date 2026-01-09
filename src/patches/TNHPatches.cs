@@ -1979,6 +1979,47 @@ namespace H3MP.Patches
                 Mod.TNHStartEquipButton = GameObject.Instantiate(Mod.TNHStartEquipButtonPrefab, GM.CurrentPlayerBody.Head);
                 Mod.TNHStartEquipButton.transform.GetChild(0).GetComponent<FVRPointableButton>().Button.onClick.AddListener(Mod.OnTNHSpawnStartEquipClicked);
             }
+        
+        public static void UpdateHostForJoiningPlayer(int joiningPlayerID)
+    {
+        Mod.LogInfo("UpdateHostForJoiningPlayer called for player " + joiningPlayerID);
+        
+        if (Mod.currentTNHInstance == null || Mod.currentTNHInstance.manager == null)
+        {
+            return;
+        }
+
+        // Add joining player to radar if they're in currentlyPlaying
+        if (Mod.currentTNHInstance.currentlyPlaying.Contains(joiningPlayerID) && 
+            GameManager.players.TryGetValue(joiningPlayerID, out PlayerManager player))
+        {
+            switch (GameManager.radarMode)
+            {
+                case 0: // All
+                    player.reticleContact = Mod.currentTNHInstance.manager.TAHReticle.RegisterTrackedObject(
+                        player.head, 
+                        (TAH_ReticleContact.ContactType)(GameManager.radarColor ? 
+                            (player.IFF == GM.CurrentPlayerBody.GetPlayerIFF() ? -2 : -3) : 
+                            player.colorIndex - 4)
+                    );
+                    break;
+                case 1: // Friendly only
+                    if (player.IFF == GM.CurrentPlayerBody.GetPlayerIFF())
+                    {
+                        player.reticleContact = Mod.currentTNHInstance.manager.TAHReticle.RegisterTrackedObject(
+                            player.head,
+                            (TAH_ReticleContact.ContactType)(GameManager.radarColor ?
+                                (player.IFF == GM.CurrentPlayerBody.GetPlayerIFF() ? -2 : -3) :
+                                player.colorIndex - 4)
+                        );
+                    }
+                    break;
+            }
+        }
+
+        Mod.LogInfo("Player " + joiningPlayerID + " added to host's TNH radar");
+    }
+        
         }
 
         static bool InitBeginEquipPrefix()
