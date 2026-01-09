@@ -1979,6 +1979,7 @@ namespace H3MP.Patches
                 Mod.TNHStartEquipButton = GameObject.Instantiate(Mod.TNHStartEquipButtonPrefab, GM.CurrentPlayerBody.Head);
                 Mod.TNHStartEquipButton.transform.GetChild(0).GetComponent<FVRPointableButton>().Button.onClick.AddListener(Mod.OnTNHSpawnStartEquipClicked);
             }
+}
         
         public static void UpdateHostForJoiningPlayer(int joiningPlayerID)
     {
