@@ -746,23 +746,6 @@ namespace H3MP
                                     }
                                 }
                                 break;
-                        case 40: // Spawn fake client
-    Mod.LogInfo("\tDebug: Spawn fake client");
-    if (FakeClient.instance == null)
-    {
-        GameObject fakeClientObj = new GameObject("FakeClient");
-        FakeClient fakeClient = fakeClientObj.AddComponent<FakeClient>();
-        DontDestroyOnLoad(fakeClientObj);
-    }
-    FakeClient.instance.SpawnFakeClient();
-    break;
-case 41: // Despawn fake client
-    Mod.LogInfo("\tDebug: Despawn fake client");
-    if (FakeClient.instance != null)
-    {
-        FakeClient.instance.DespawnFakeClient();
-    }
-    break;
                         
                         }
                     }
