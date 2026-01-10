@@ -1394,7 +1394,7 @@ Mod.currentTNHUIManager = GameObject.FindObjectOfType<TNH_UIManager>();
 // Only look for SceneLoader in actual TNH game scenes, not lobby
 if (!GameManager.scene.Contains("Lobby"))
 {
-    Mod.currentTNHSceneLoader = GameObject.FindObjectOfType<SceneLoader>(true); // true = include inactive
+    Mod.currentTNHSceneLoader = GameObject.FindObjectOfType<SceneLoader>(); // true = include inactive
 }
 else
 {
