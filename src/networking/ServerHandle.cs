@@ -4701,7 +4701,7 @@ namespace H3MP.Networking
                     }
                     else
                     {
-                        if (GameManager.scene.Equals("TakeAndHold_Lobby_2"))
+if (GameManager.scene.Contains("Lobby") && GameManager.scene.StartsWith("TakeAndHold"))
                         {
                             Mod.OnTNHHostClicked();
                             Mod.TNHOnDeathSpectate = packet.ReadBool();
