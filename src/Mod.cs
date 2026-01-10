@@ -1693,7 +1693,7 @@ public static void InitTNHUIManager(TNHInstance instance)
 
             Server.Start((ushort)config["MaxClientCount"], (ushort)config["Port"], (int)config["TickRate"]);
 
-            if (GameManager.scene.Equals("TakeAndHold_Lobby_2"))
+if (GameManager.scene.Contains("Lobby") && GameManager.scene.StartsWith("TakeAndHold"))
             {
                 LogInfo("Just connected in TNH lobby, initializing H3MP menu");
                 InitTNHMenu();
@@ -1751,7 +1751,7 @@ public static void InitTNHUIManager(TNHInstance instance)
 
             client.ConnectToServer();
 
-            if (GameManager.scene.Equals("TakeAndHold_Lobby_2"))
+if (GameManager.scene.Contains("Lobby") && GameManager.scene.StartsWith("TakeAndHold"))
             {
                 LogInfo("Just connected in TNH lobby, initializing H3MP menu");
                 InitTNHMenu();
