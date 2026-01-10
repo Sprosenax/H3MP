@@ -25,7 +25,7 @@ jobs:
       run: nuget restore H3MP.sln
       
     - name: Build solution
-      run: msbuild H3MP.sln /p:Configuration=Release /p:Platform="Any CPU" /verbosity:minimal
+      run: msbuild H3MP.sln /p:Configuration=Debug /p:Platform="Any CPU" /verbosity:minimal
       
     - name: Package mod
       run: |
