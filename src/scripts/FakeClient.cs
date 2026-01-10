@@ -31,58 +31,93 @@ namespace H3MP.Scripts
             instance = this;
         }
         
-        public void SpawnFakeClient()
+public void SpawnFakeClient()
+{
+    if (fakePlayerObject != null)
+    {
+        Mod.LogWarning("Fake client already spawned!");
+        return;
+    }
+
+    // Get the player prefab correctly
+    GameObject playerPrefab = null;
+    
+    // Try to get from IM
+    if (IM.OD != null && IM.OD.TryGetValue(GameManager.playerPrefabID, out FVRObject fvrObj))
+    {
+        playerPrefab = fvrObj.GetGameObject();
+    }
+    
+    // If that didn't work, try to find an existing player and clone their prefab reference
+    if (playerPrefab == null)
+    {
+        foreach (PlayerManager existingPlayer in GameManager.players.Values)
         {
-            if (fakePlayerObject != null)
+            if (existingPlayer != null && existingPlayer.gameObject != null)
             {
-                Mod.LogWarning("Fake client already spawned!");
-                return;
+                // Get the prefab name from the existing player
+                string prefabName = existingPlayer.gameObject.name.Replace("(Clone)", "").Trim();
+                if (IM.OD != null)
+                {
+                    foreach (var kvp in IM.OD)
+                    {
+                        if (kvp.Value.name == prefabName)
+                        {
+                            playerPrefab = kvp.Value.GetGameObject();
+                            break;
+                        }
+                    }
+                }
+                if (playerPrefab != null) break;
             }
-            
-            if (Mod.playerPrefab == null)
-            {
-                Mod.LogError("Cannot spawn fake client - player prefab is null!");
-                return;
-            }
-            
-            // Spawn the fake player
-            fakePlayerObject = Instantiate(Mod.playerPrefab);
-            fakePlayerManager = fakePlayerObject.GetComponent<PlayerManager>();
-            
-            if (fakePlayerManager == null)
-            {
-                Mod.LogError("Fake client player prefab has no PlayerManager!");
-                Destroy(fakePlayerObject);
-                return;
-            }
-            
-            // Configure fake player
-            fakePlayerManager.ID = fakeClientID;
-            fakePlayerManager.username = "FakeClient_TestDummy";
-            fakePlayerManager.scene = GameManager.scene;
-            fakePlayerManager.instance = GameManager.instance;
-            
-            // Set IFF to friendly
-            if (GM.CurrentPlayerBody != null)
-            {
-                fakePlayerManager.SetIFF(GM.CurrentPlayerBody.GetPlayerIFF());
-            }
-            
-            // Add to GameManager
-            if (!GameManager.players.ContainsKey(fakeClientID))
-            {
-                GameManager.players.Add(fakeClientID, fakePlayerManager);
-            }
-            
-            // Position behind the real player
-            if (GM.CurrentPlayerBody != null)
-            {
-                Vector3 spawnPos = GM.CurrentPlayerBody.Head.position - GM.CurrentPlayerBody.Head.forward * followDistance;
-                fakePlayerObject.transform.position = spawnPos;
-            }
-            
-            Mod.LogInfo("Fake client spawned successfully!", false);
         }
+    }
+
+    if (playerPrefab == null)
+    {
+        Mod.LogError("Could not find player prefab!");
+        return;
+    }
+
+    PlayerManager prefabManager = playerPrefab.GetComponent<PlayerManager>();
+    if (prefabManager == null)
+    {
+        Mod.LogError("Fake client player prefab has no PlayerManager!");
+        return;
+    }
+
+    // Rest of your spawn code...
+    int fakeID = GetNextAvailableID();
+    fakePlayerID = fakeID;
+
+    Vector3 spawnPos = GM.CurrentPlayerBody.Head.position + GM.CurrentPlayerBody.Head.forward * 2f;
+    fakePlayerObject = Instantiate(playerPrefab, spawnPos, Quaternion.identity);
+    fakePlayerObject.name = "FakePlayer_" + fakeID;
+
+    fakePlayerManager = fakePlayerObject.GetComponent<PlayerManager>();
+    if (fakePlayerManager == null)
+    {
+        Mod.LogError("Instantiated fake player has no PlayerManager!");
+        Destroy(fakePlayerObject);
+        fakePlayerObject = null;
+        return;
+    }
+
+    // Initialize the fake player
+    fakePlayerManager.ID = fakeID;
+    fakePlayerManager.username = "FakePlayer" + fakeID;
+    fakePlayerManager.scene = GameManager.scene;
+    fakePlayerManager.instance = GameManager.instance;
+    fakePlayerManager.IFF = GM.CurrentPlayerBody.GetPlayerIFF();
+
+    // Add to GameManager
+    if (!GameManager.players.ContainsKey(fakeID))
+    {
+        GameManager.players.Add(fakeID, fakePlayerManager);
+    }
+
+    Mod.LogInfo("Fake client spawned with ID: " + fakeID);
+}
         
         public void DespawnFakeClient()
         {
