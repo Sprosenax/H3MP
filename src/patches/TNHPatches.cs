@@ -3242,7 +3242,7 @@ namespace H3MP.Patches
         static bool LoadMGPrefix(SceneLoader __instance)
         {
             // If we are in a TNH instance hosted by a spectator host but spectator host is not yet in the game
-            if (Mod.managerObject != null && !GameManager.spectatorHost && !GameManager.sceneLoading && GameManager.scene.Equals("TakeAndHold_Lobby_2") && 
+            if (Mod.managerObject != null && !GameManager.spectatorHost && !GameManager.sceneLoading && GameManager.scene.Contains("Lobby") && GameManager.scene.StartsWith("TakeAndHold") && 
                 Mod.currentTNHInstance != null && Mod.currentTNHInstance.playerIDs.Count > 0 && GameManager.spectatorHosts.Contains(Mod.currentTNHInstance.playerIDs[0]) &&
                 !Mod.currentTNHInstance.currentlyPlaying.Contains(Mod.currentTNHInstance.playerIDs[0]))
             {
