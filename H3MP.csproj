@@ -105,7 +105,6 @@
     <Compile Include="src\networking\Server.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\patches\ActionPatches.cs" />
-<Compile Include="src\scripts\FakeClient.cs" />
     <Compile Include="src\patches\DamagePatches.cs" />
     <Compile Include="src\patches\GeneralPatches.cs" />
     <Compile Include="src\patches\InstantiationPatches.cs" />
