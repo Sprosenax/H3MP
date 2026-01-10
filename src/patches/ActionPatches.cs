@@ -292,19 +292,31 @@ namespace H3MP.Patches
 
             ++patchIndex; // 18
             
-            // SosigAwakePatch - Add TrackedSosig component immediately on spawn
-            MethodInfo sosigAwakePatchOriginal = typeof(Sosig).GetMethod("Awake", BindingFlags.NonPublic | BindingFlags.Instance);
-            MethodInfo sosigAwakePatchPostfix = typeof(SosigAwakePatch).GetMethod("Postfix", BindingFlags.NonPublic | BindingFlags.Static);
+ // SosigAwakePatch - Add TrackedSosig component immediately on spawn
+MethodInfo sosigAwakePatchOriginal = typeof(Sosig).GetMethod("Awake", BindingFlags.NonPublic | BindingFlags.Instance);
+MethodInfo sosigAwakePatchPostfix = typeof(SosigAwakePatch).GetMethod("Postfix", BindingFlags.NonPublic | BindingFlags.Static);
 
-            if (sosigAwakePatchOriginal != null)
-            {
-                PatchController.Verify(sosigAwakePatchOriginal, harmony, false);
-                harmony.Patch(sosigAwakePatchOriginal, null, new HarmonyMethod(sosigAwakePatchPostfix));
-            }
-            else
-            {
-                Mod.LogWarning("Sosig.Awake method not found, TrackedSosig timing issue may occur");
-            }
+Mod.LogInfo("Attempting to patch Sosig.Awake...", false);
+Mod.LogInfo("sosigAwakePatchOriginal null?: " + (sosigAwakePatchOriginal == null), false);
+Mod.LogInfo("sosigAwakePatchPostfix null?: " + (sosigAwakePatchPostfix == null), false);
+
+if (sosigAwakePatchOriginal != null && sosigAwakePatchPostfix != null)
+{
+    try
+    {
+        PatchController.Verify(sosigAwakePatchOriginal, harmony, false);
+        harmony.Patch(sosigAwakePatchOriginal, null, new HarmonyMethod(sosigAwakePatchPostfix));
+        Mod.LogInfo("Successfully patched Sosig.Awake", false);
+    }
+    catch (Exception ex)
+    {
+        Mod.LogError("Failed to patch Sosig.Awake: " + ex.Message);
+    }
+}
+else
+{
+    Mod.LogError("Sosig.Awake method not found, TrackedSosig timing issue WILL occur!");
+}
 
             ++patchIndex; // 19
             
@@ -1270,25 +1282,37 @@ namespace H3MP.Patches
     // Patches Sosig.Awake to add TrackedSosig component immediately
     class SosigAwakePatch
     {
-        static void Postfix(Sosig __instance)
-        {
-            if (Mod.managerObject == null)
-            {
-                return;
-            }
-
-            // Only add if not already present
-            if (__instance.GetComponent<TrackedSosig>() != null)
-            {
-                return;
-            }
-
-            // Add TrackedSosig component immediately so it exists before any other sosig code runs
-            __instance.gameObject.AddComponent<TrackedSosig>();
-            
-            Mod.LogInfo($"Added TrackedSosig to {__instance.name} in Awake", false);
-        }
+static void Postfix(Sosig __instance)
+{
+    // ALWAYS log that we got here
+    Mod.LogInfo($"SosigAwakePatch.Postfix called for {__instance.name}", false);
+    
+    if (Mod.managerObject == null)
+    {
+        Mod.LogInfo($"SosigAwakePatch: Skipping {__instance.name} - managerObject is null", false);
+        return;
     }
+    
+    // Only add if not already present
+    TrackedSosig existing = __instance.GetComponent<TrackedSosig>();
+    if (existing != null)
+    {
+        Mod.LogInfo($"SosigAwakePatch: {__instance.name} already has TrackedSosig", false);
+        return;
+    }
+    
+    // Add TrackedSosig component immediately so it exists before any other sosig code runs
+    TrackedSosig trackedSosig = __instance.gameObject.AddComponent<TrackedSosig>();
+    
+    if (trackedSosig != null)
+    {
+        Mod.LogInfo($"SosigAwakePatch: Successfully added TrackedSosig to {__instance.name}", false);
+    }
+    else
+    {
+        Mod.LogError($"SosigAwakePatch: FAILED to add TrackedSosig to {__instance.name}!");
+    }
+}
 
 
 
