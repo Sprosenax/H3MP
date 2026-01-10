@@ -1193,10 +1193,19 @@ case 41: // Despawn fake client
             currentButton.MaxPointingRange = 5;
             currentButton.Button.onClick.AddListener(OnTNHRequestHostWaitingCancelClicked);
 
-// Get ref to the UI Manager
 Mod.currentTNHUIManager = GameObject.FindObjectOfType<TNH_UIManager>();
-Mod.currentTNHSceneLoader = GameObject.FindObjectOfType<SceneLoader>();
-Mod.LogInfo("Looking for SceneLoader: " + (Mod.currentTNHSceneLoader != null));
+
+// Only look for SceneLoader in actual TNH game scenes, not lobby
+if (!GameManager.scene.Contains("Lobby"))
+{
+    Mod.currentTNHSceneLoader = GameObject.FindObjectOfType<SceneLoader>(true); // true = include inactive
+    Mod.LogInfo("Looking for SceneLoader: " + (Mod.currentTNHSceneLoader != null));
+}
+else
+{
+    Mod.currentTNHSceneLoader = null;
+    Mod.LogInfo("In TNH lobby, SceneLoader not needed");
+}
 
 if (Mod.currentTNHSceneLoader == null)
 {
