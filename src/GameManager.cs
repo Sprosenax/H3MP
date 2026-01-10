@@ -1389,12 +1389,22 @@ namespace H3MP
                 }
                 else
                 {
-                    Mod.currentTNHUIManager = GameObject.FindObjectOfType<TNH_UIManager>();
-                    Mod.currentTNHSceneLoader = GameObject.FindObjectOfType<SceneLoader>();
-                    if (Mod.currentTNHUIManager != null)
-                    {
-                        Mod.InitTNHUIManager(TNHInstances[instance]);
-                    }
+Mod.currentTNHUIManager = GameObject.FindObjectOfType<TNH_UIManager>();
+
+// Only look for SceneLoader in actual TNH game scenes, not lobby
+if (!GameManager.scene.Contains("Lobby"))
+{
+    Mod.currentTNHSceneLoader = GameObject.FindObjectOfType<SceneLoader>(true); // true = include inactive
+}
+else
+{
+    Mod.currentTNHSceneLoader = null;
+}
+
+if (Mod.currentTNHUIManager != null)
+{
+    Mod.InitTNHUIManager(TNHInstances[instance]);
+}
                 }
             }
 
