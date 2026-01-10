@@ -30,7 +30,7 @@ jobs:
     - name: Package mod
       run: |
         mkdir debug
-        copy bin\Release\H3MP.dll release\
+        copy bin\Debug\H3MP.dll release\
         if exist H3MP.ab copy H3MP.ab release\
         if exist Config.json copy Config.json release\
         if exist SosigWearableMap.json copy SosigWearableMap.json release\
@@ -47,6 +47,6 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v1
       with:
-        files: release/*
+        files: debug/*
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
