@@ -1874,7 +1874,7 @@ if (Mod.currentTNHUIManager != null)
 
                         if (Mod.spectatorHostWaitingForTNHSetup)
                         {
-                            if (scene.Equals("TakeAndHold_Lobby_2"))
+if (scene.Contains("Lobby") && scene.StartsWith("TakeAndHold"))
                             {
                                 if (spectatorHostControlledBy != -1)
                                 {
