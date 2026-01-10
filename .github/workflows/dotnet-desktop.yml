@@ -30,10 +30,10 @@ jobs:
     - name: Package mod
       run: |
         mkdir debug
-        copy bin\Debug\H3MP.dll release\
-        if exist H3MP.ab copy H3MP.ab release\
-        if exist Config.json copy Config.json release\
-        if exist SosigWearableMap.json copy SosigWearableMap.json release\
+        copy bin\Debug\H3MP.dll debug\
+        if exist H3MP.ab copy H3MP.ab debug\
+        if exist Config.json copy Config.json debug\
+        if exist SosigWearableMap.json copy SosigWearableMap.json debug\
       shell: cmd
       
     - name: Upload build artifacts
