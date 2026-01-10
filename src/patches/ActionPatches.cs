@@ -1313,7 +1313,7 @@ static void Postfix(Sosig __instance)
         Mod.LogError($"SosigAwakePatch: FAILED to add TrackedSosig to {__instance.name}!");
     }
 }
-
+    }
 
 
     // Patches ModularWeaponPart
