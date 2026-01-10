@@ -29,7 +29,7 @@ jobs:
       
     - name: Package mod
       run: |
-        mkdir release
+        mkdir debug
         copy bin\Release\H3MP.dll release\
         if exist H3MP.ab copy H3MP.ab release\
         if exist Config.json copy Config.json release\
@@ -39,8 +39,8 @@ jobs:
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: H3MP-Release
-        path: release/
+        name: H3MP-Debug
+        path: debug/
         if-no-files-found: error
         
     - name: Create Release (on tag)
