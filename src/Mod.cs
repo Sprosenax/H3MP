@@ -1302,7 +1302,7 @@ public static void InitTNHUIManager(TNHInstance instance)
     if (Mod.currentTNHUIManager.OBS_HealthMult == null) Mod.LogWarning("OBS_HealthMult is null");
     if (Mod.currentTNHUIManager.OBS_SosiggunReloading == null) Mod.LogWarning("OBS_SosiggunReloading is null");
     if (Mod.currentTNHUIManager.OBS_RunSeed == null) Mod.LogWarning("OBS_RunSeed is null");
-    if (Mod.currentTNHSceneLoader == null) Mod.LogWarning("currentTNHSceneLoader is null")
+    if (Mod.currentTNHSceneLoader == null) Mod.LogWarning("currentTNHSceneLoader is null");
     
     // Find level
     bool found = false;
