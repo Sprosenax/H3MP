@@ -6587,8 +6587,8 @@ static void Postfix(Sosig __instance)
 
             List<CodeInstruction> toInsert = new List<CodeInstruction>();
             toInsert.Add(new CodeInstruction(OpCodes.Ldarg_0)); // Load encryption instance
-            toInsert.Add(new CodeInstruction(OpCodes.Ldloc_1)); // Load j
-            toInsert.Add(new CodeInstruction(OpCodes.Ldloc_2)); // Load the newly instantiated GameObject
+            toInsert.Add(new CodeInstruction(OpCodes.Ldloc_3)); // Load j
+            toInsert.Add(new CodeInstruction(OpCodes.Ldloc_S, (byte)4)); // Load GameObject from slot 4
             toInsert.Add(new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(GameObject), "get_transform"))); // Get transform
             toInsert.Add(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(EncryptionPatch), "EncryptionSpawnOnDestroy"))); // Call our method
 
@@ -6597,7 +6597,7 @@ static void Postfix(Sosig __instance)
             {
                 CodeInstruction instruction = instructionList[i];
 
-                if (instruction.opcode == OpCodes.Stloc_2)
+                if (instruction.opcode == OpCodes.Stloc_S && instruction.operand is LocalBuilder local && local.LocalIndex == 4)
                 {
                     instructionList.InsertRange(i + 1, toInsert);
                     applied = true;
