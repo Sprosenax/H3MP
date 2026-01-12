@@ -1290,72 +1290,19 @@ public static void InitTNHUIManager(TNHInstance instance)
         return;
     }
 
-    // Add null checks for each OBS component
-    if (Mod.currentTNHUIManager.OBS_Progression != null)
-    {
-        Mod.currentTNHUIManager.OBS_Progression.SetSelectedButton(instance.progressionTypeSetting);
-        GM.TNHOptions.ProgressionTypeSetting = (TNHSetting_ProgressionType)instance.progressionTypeSetting;
-    }
-    
-    if (Mod.currentTNHUIManager.OBS_EquipmentMode != null)
-    {
-        Mod.currentTNHUIManager.OBS_EquipmentMode.SetSelectedButton(instance.equipmentModeSetting);
-        GM.TNHOptions.EquipmentModeSetting = (TNHSetting_EquipmentMode)instance.equipmentModeSetting;
-    }
-    
-    if (Mod.currentTNHUIManager.OBS_HealthMode != null)
-    {
-        Mod.currentTNHUIManager.OBS_HealthMode.SetSelectedButton(instance.healthModeSetting);
-        GM.TNHOptions.HealthModeSetting = (TNHSetting_HealthMode)instance.healthModeSetting;
-    }
-    
-    if (Mod.currentTNHUIManager.OBS_TargetMode != null)
-    {
-        Mod.currentTNHUIManager.OBS_TargetMode.SetSelectedButton(instance.targetModeSetting);
-        GM.TNHOptions.TargetModeSetting = (TNHSetting_TargetMode)instance.targetModeSetting;
-    }
-    
-    if (Mod.currentTNHUIManager.OBS_AIDifficulty != null)
-    {
-        Mod.currentTNHUIManager.OBS_AIDifficulty.SetSelectedButton(instance.AIDifficultyModifier);
-        GM.TNHOptions.AIDifficultyModifier = (TNHModifier_AIDifficulty)instance.AIDifficultyModifier;
-    }
-    
-    if (Mod.currentTNHUIManager.OBS_AIRadarMode != null)
-    {
-        Mod.currentTNHUIManager.OBS_AIRadarMode.SetSelectedButton(instance.radarModeModifier);
-        GM.TNHOptions.RadarModeModifier = (TNHModifier_RadarMode)instance.radarModeModifier;
-    }
-    
-    if (Mod.currentTNHUIManager.OBS_ItemSpawner != null)
-    {
-        Mod.currentTNHUIManager.OBS_ItemSpawner.SetSelectedButton(instance.itemSpawnerMode);
-        GM.TNHOptions.ItemSpawnerMode = (TNH_ItemSpawnerMode)instance.itemSpawnerMode;
-    }
-    
-    if (Mod.currentTNHUIManager.OBS_Backpack != null)
-    {
-        Mod.currentTNHUIManager.OBS_Backpack.SetSelectedButton(instance.backpackMode);
-        GM.TNHOptions.BackpackMode = (TNH_BackpackMode)instance.backpackMode;
-    }
-    
-    if (Mod.currentTNHUIManager.OBS_HealthMult != null)
-    {
-        Mod.currentTNHUIManager.OBS_HealthMult.SetSelectedButton(instance.healthMult);
-        GM.TNHOptions.HealthMult = (TNH_HealthMult)instance.healthMult;
-    }
-    
-    if (Mod.currentTNHUIManager.OBS_SosiggunReloading != null)
-    {
-        Mod.currentTNHUIManager.OBS_SosiggunReloading.SetSelectedButton(instance.sosiggunShakeReloading);
-        GM.TNHOptions.SosiggunShakeReloading = (TNH_SosiggunShakeReloading)instance.sosiggunShakeReloading;
-    }
-    
-    if (Mod.currentTNHUIManager.OBS_RunSeed != null)
-    {
-        Mod.currentTNHUIManager.OBS_RunSeed.SetSelectedButton(instance.TNHSeed + 1);
-        GM.TNHOptions.TNHSeed = instance.TNHSeed;
-    }
+    // LOG WHICH COMPONENTS ARE MISSING
+    if (Mod.currentTNHUIManager.OBS_Progression == null) Mod.LogWarning("OBS_Progression is null");
+    if (Mod.currentTNHUIManager.OBS_EquipmentMode == null) Mod.LogWarning("OBS_EquipmentMode is null");
+    if (Mod.currentTNHUIManager.OBS_HealthMode == null) Mod.LogWarning("OBS_HealthMode is null");
+    if (Mod.currentTNHUIManager.OBS_TargetMode == null) Mod.LogWarning("OBS_TargetMode is null");
+    if (Mod.currentTNHUIManager.OBS_AIDifficulty == null) Mod.LogWarning("OBS_AIDifficulty is null");
+    if (Mod.currentTNHUIManager.OBS_AIRadarMode == null) Mod.LogWarning("OBS_AIRadarMode is null");
+    if (Mod.currentTNHUIManager.OBS_ItemSpawner == null) Mod.LogWarning("OBS_ItemSpawner is null");
+    if (Mod.currentTNHUIManager.OBS_Backpack == null) Mod.LogWarning("OBS_Backpack is null");
+    if (Mod.currentTNHUIManager.OBS_HealthMult == null) Mod.LogWarning("OBS_HealthMult is null");
+    if (Mod.currentTNHUIManager.OBS_SosiggunReloading == null) Mod.LogWarning("OBS_SosiggunReloading is null");
+    if (Mod.currentTNHUIManager.OBS_RunSeed == null) Mod.LogWarning("OBS_RunSeed is null");
+    if (Mod.currentTNHSceneLoader == null) Mod.LogWarning("currentTNHSceneLoader is null")
     
     // Find level
     bool found = false;
