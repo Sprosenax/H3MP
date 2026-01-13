@@ -1284,36 +1284,44 @@ else
     {
 static void Postfix(Sosig __instance)
 {
-    // ALWAYS log that we got here
     Mod.LogInfo($"SosigAwakePatch.Postfix called for {__instance.name}", false);
     
     if (Mod.managerObject == null)
     {
-        Mod.LogInfo($"SosigAwakePatch: Skipping {__instance.name} - managerObject is null", false);
+        Mod.LogInfo($"SosigAwakePatch: Skipping - managerObject is null", false);
         return;
     }
     
-    // Only add if not already present
+    // Check if already tracked
     TrackedSosig existing = __instance.GetComponent<TrackedSosig>();
     if (existing != null)
     {
-        Mod.LogInfo($"SosigAwakePatch: {__instance.name} already has TrackedSosig", false);
+        Mod.LogInfo($"SosigAwakePatch: {__instance.name} already tracked", false);
         return;
     }
     
-    // Add TrackedSosig component immediately so it exists before any other sosig code runs
-    TrackedSosig trackedSosig = __instance.gameObject.AddComponent<TrackedSosig>();
-    
-    if (trackedSosig != null)
+    // Call MakeTracked via reflection to properly initialize everything
+    try
     {
-        Mod.LogInfo($"SosigAwakePatch: Successfully added TrackedSosig to {__instance.name}", false);
+        Type trackedSosigDataType = typeof(TrackedSosigData);
+        System.Reflection.MethodInfo makeTrackedMethod = trackedSosigDataType.GetMethod("MakeTracked", 
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        
+        if (makeTrackedMethod != null)
+        {
+            TrackedSosig trackedSosig = (TrackedSosig)makeTrackedMethod.Invoke(null, new object[] { __instance.transform, null });
+            Mod.LogInfo($"SosigAwakePatch: Successfully tracked {__instance.name}", false);
+        }
+        else
+        {
+            Mod.LogError("SosigAwakePatch: MakeTracked method not found!");
+        }
     }
-    else
+    catch (System.Exception ex)
     {
-        Mod.LogError($"SosigAwakePatch: FAILED to add TrackedSosig to {__instance.name}!");
+        Mod.LogError($"SosigAwakePatch: Exception: {ex.Message}");
     }
 }
-    }
 
 
     // Patches ModularWeaponPart
