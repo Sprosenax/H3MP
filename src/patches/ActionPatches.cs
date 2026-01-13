@@ -1322,7 +1322,7 @@ static void Postfix(Sosig __instance)
         Mod.LogError($"SosigAwakePatch: Exception: {ex.Message}");
     }
 }
-
+    }
 
     // Patches ModularWeaponPart
     class ModularWeaponPartPatch
