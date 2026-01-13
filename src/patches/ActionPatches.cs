@@ -4018,6 +4018,14 @@ static void Postfix(Sosig __instance)
                 {
                     ClientSend.SosigDies(trackedSosig.data.trackedID, damClass, deathType);
                 }
+            
+                // ADD THIS - Prevent crash when sosig or component is null
+    if (__instance == null)
+    {
+        Mod.LogWarning("SosigDiesPrefix: __instance is null");
+        return;
+    }
+            
             }
         }
 
