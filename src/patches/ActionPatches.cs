@@ -3998,45 +3998,44 @@ static void Postfix(Sosig __instance)
         public static int sosigRequestHitDecalSkip;
         public static int skipSendingOrder;
 
-        static void SosigDiesPrefix(ref Sosig __instance, Damage.DamageClass damClass, Sosig.SosigDeathType deathType)
-        {
-            ++SosigHandDropPatch.skip;
-            ++SosigSlotDetachPatch.skip;
-            ++SosigPatch.sosigSetBodyStateSkip;
-
-            if (sosigDiesSkip > 0)
-            {
-                return;
-            }
-
-            // Skip if not connected
-            if (Mod.managerObject == null)
-            {
-                return;
-            }
-
-            TrackedSosig trackedSosig = GameManager.trackedSosigBySosig.ContainsKey(__instance) ? GameManager.trackedSosigBySosig[__instance] : __instance.GetComponent<TrackedSosig>();
-            if (trackedSosig != null && trackedSosig.data.trackedID != -1)
-            {
-                if (ThreadManager.host)
-                {
-                    ServerSend.SosigDies(trackedSosig.data.trackedID, damClass, deathType);
-                }
-                else
-                {
-                    ClientSend.SosigDies(trackedSosig.data.trackedID, damClass, deathType);
-                }
-            
-                // ADD THIS - Prevent crash when sosig or component is null
+static void SosigDiesPrefix(ref Sosig __instance, Damage.DamageClass damClass, Sosig.SosigDeathType deathType)
+{
+    ++SosigHandDropPatch.skip;
+    ++SosigSlotDetachPatch.skip;
+    ++SosigPatch.sosigSetBodyStateSkip;
+    
+    if (sosigDiesSkip > 0)
+    {
+        return;
+    }
+    
+    // Skip if not connected
+    if (Mod.managerObject == null)
+    {
+        return;
+    }
+    
+    // NULL CHECK MUST BE HERE - BEFORE GetComponent!
     if (__instance == null)
     {
         Mod.LogWarning("SosigDiesPrefix: __instance is null");
         return;
     }
-            
-            }
+    
+    TrackedSosig trackedSosig = GameManager.trackedSosigBySosig.ContainsKey(__instance) ? GameManager.trackedSosigBySosig[__instance] : __instance.GetComponent<TrackedSosig>();
+    
+    if (trackedSosig != null && trackedSosig.data.trackedID != -1)
+    {
+        if (ThreadManager.host)
+        {
+            ServerSend.SosigDies(trackedSosig.data.trackedID, damClass, deathType);
         }
-
+        else
+        {
+            ClientSend.SosigDies(trackedSosig.data.trackedID, damClass, deathType);
+        }
+    }
+}
         static void SosigDiesPostfix()
         {
             --SosigHandDropPatch.skip;
