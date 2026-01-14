@@ -2311,7 +2311,7 @@ namespace H3MP.Patches
                         // Send update
                         if (ThreadManager.host)
                         {
-                            ServerSend.TNHHoldBeginChallenge(Mod.currentTNHInstance.instance, true, true, 0);
+                            ServerSend.TNHHoldBeginChallenge(Mod.currentTNHInstance.instance, true, true, 0, GameManager.ID);
                         }
                         else
                         {
@@ -2328,7 +2328,7 @@ namespace H3MP.Patches
                         Mod.LogInfo("\t\tNot skipped, sending to controller: "+ Mod.currentTNHInstance.controller, false);
                         if (ThreadManager.host)
                         {
-                            ServerSend.TNHHoldBeginChallenge(Mod.currentTNHInstance.instance, false, false, Mod.currentTNHInstance.controller);
+                            ServerSend.TNHHoldBeginChallenge(Mod.currentTNHInstance.instance, false, false, Mod.currentTNHInstance.controller, GameManager.ID);
                         }
                         else
                         {
