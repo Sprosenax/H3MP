@@ -2259,10 +2259,11 @@ namespace H3MP.Patches
                         // Update locally
                         Mod.currentTNHInstance.curHoldIndex = holdPointIndex;
                         Mod.currentTNHInstance.level = GM.TNH_Manager.m_level;
-
+Vector3 holdPos = __instance.SpawnPoint_SystemNode.position;
+                        
                         if (ThreadManager.host)
                         {
-                            Vector3 holdPos = __instance.SpawnPoint_SystemNode.position;
+                            
                             ServerSend.TNHHoldPointSystemNode(Mod.currentTNHInstance.instance, Mod.currentTNHInstance.level, holdPointIndex, holdPos);
                         }
                         else
