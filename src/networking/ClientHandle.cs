@@ -2631,7 +2631,8 @@ namespace H3MP.Networking
             int instance = packet.ReadInt();
             int levelIndex = packet.ReadInt();
             int holdPointIndex = packet.ReadInt();
-
+            Vector3 holdPosition = packet.ReadVector3();
+            
             if (GameManager.TNHInstances.TryGetValue(instance, out TNHInstance actualInstance))
             {
                 actualInstance.curHoldIndex = holdPointIndex;
@@ -2640,6 +2641,8 @@ namespace H3MP.Networking
                 if (actualInstance.manager != null && actualInstance.manager.m_hasInit)
                 {
                     actualInstance.manager.SetLevel(levelIndex);
+                
+                    actualInstance.manager.HoldPoints[holdPointIndex].SpawnPoint_SystemNode.position = holdPosition;
                 }
             }
         }
