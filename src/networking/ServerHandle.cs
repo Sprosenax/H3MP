@@ -2839,7 +2839,7 @@ namespace H3MP.Networking
             ServerSend.TNHHoldPointSystemNode(instance, levelIndex, holdPointIndex, clientID);
         }
 
-        public static void TNHHoldBeginChallenge(int clientID, Packet packet)
+public static void TNHHoldBeginChallenge(int clientID, Packet packet)
 {
     int instance = packet.ReadInt();
     bool fromController = packet.ReadBool();
