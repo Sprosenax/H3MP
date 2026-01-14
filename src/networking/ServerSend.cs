@@ -2671,32 +2671,33 @@ namespace H3MP.Networking
             }
         }
 
-        public static void TNHHoldBeginChallenge(int instance, bool controller, bool toAll, int clientID)
+public static void TNHHoldBeginChallenge(int instance, bool controller, bool toAll, int clientID, int starterID)
+{
+    using (Packet packet = new Packet((int)ServerPackets.TNHHoldBeginChallenge))
+    {
+        Mod.LogInfo("TNHHoldBeginChallenge server send", false);
+        packet.Write(instance);
+        packet.Write(controller);
+        packet.Write(starterID); // ADD THIS - who actually started the hold
+        
+        if (toAll)
         {
-            using (Packet packet = new Packet((int)ServerPackets.TNHHoldBeginChallenge))
+            if (clientID == 0)
             {
-                Mod.LogInfo("TNHHoldBeginChallenge server send", false);
-                packet.Write(instance);
-                packet.Write(controller);
-
-                if (toAll)
-                {
-                    if (clientID == 0)
-                    {
-                        SendTCPDataToAll(packet);
-                    }
-                    else
-                    {
-                        SendTCPDataToAll(clientID, packet);
-                    }
-                }
-                else
-                {
-                    Mod.LogInfo("\tSpecifically to controller: "+clientID, false);
-                    SendTCPData(clientID, packet);
-                }
+                SendTCPDataToAll(packet);
+            }
+            else
+            {
+                SendTCPDataToAll(clientID, packet);
             }
         }
+        else
+        {
+            Mod.LogInfo("\tSpecifically to controller: "+clientID, false);
+            SendTCPData(clientID, packet);
+        }
+    }
+}
 
         public static void ShatterableCrateSetHoldingHealth(int trackedID, int clientID = 0)
         {
