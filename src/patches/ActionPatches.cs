@@ -329,6 +329,29 @@ else
 
             ++patchIndex; // 19
 
+            MethodInfo tryToFireGunOriginal = typeof(SosigWeapon).GetMethod("TryToFireGun", BindingFlags.Public | BindingFlags.Instance);
+MethodInfo tryToFireGunPrefix = typeof(SosigWeaponTryToFireGunPatch).GetMethod("Prefix", BindingFlags.NonPublic | BindingFlags.Static);
+
+if (tryToFireGunOriginal != null && tryToFireGunPrefix != null)
+{
+    try
+    {
+        PatchController.Verify(tryToFireGunOriginal, harmony, false);
+        harmony.Patch(tryToFireGunOriginal, new HarmonyMethod(tryToFireGunPrefix));
+        Mod.LogInfo("Successfully patched SosigWeapon.TryToFireGun", false);
+    }
+    catch (Exception ex)
+    {
+        Mod.LogError("Failed to patch SosigWeapon.TryToFireGun: " + ex.Message);
+    }
+}
+else
+{
+    Mod.LogError("SosigWeapon.TryToFireGun method not found!");
+}
+
+++patchIndex; // 19
+
             // SosigUpdatePatch
             MethodInfo sosigUpdatePatchOriginal = typeof(Sosig).GetMethod("Update", BindingFlags.NonPublic | BindingFlags.Instance);
             MethodInfo sosigUpdatePatchPrefix = typeof(SosigUpdatePatch).GetMethod("UpdatePrefix", BindingFlags.NonPublic | BindingFlags.Static);
@@ -3899,6 +3922,18 @@ static void Postfix(Sosig __instance)
             }
         }
     }
+
+class SosigWeaponTryToFireGunPatch
+{
+    static bool Prefix(SosigWeapon __instance)
+    {
+        if (__instance == null || __instance.transform == null)
+        {
+            return false;
+        }
+        return true;
+    }
+}
 
     // Patches Sosig update methods to prevent processing on non controlling client
     class SosigUpdatePatch
