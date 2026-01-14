@@ -1572,6 +1572,7 @@ namespace H3MP.Networking
                 packet.Write(instance);
                 packet.Write(levelIndex);
                 packet.Write(holdPointIndex);
+                packet.Write(holdPosition);
 
                 SendTCPData(packet);
             }
