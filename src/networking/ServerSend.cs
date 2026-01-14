@@ -2652,13 +2652,14 @@ namespace H3MP.Networking
             }
         }
 
-        public static void TNHHoldPointSystemNode(int instance, int levelIndex, int holdPointIndex, int clientID = 0)
+        public static void TNHHoldPointSystemNode(int instance, int levelIndex, int holdPointIndex, Vector3 holdPosition, int clientID = 0)
         {
             using (Packet packet = new Packet((int)ServerPackets.TNHHoldPointSystemNode))
             {
                 packet.Write(instance);
                 packet.Write(levelIndex);
                 packet.Write(holdPointIndex);
+                packet.Write(holdPosition);
 
                 if (clientID == 0)
                 {
