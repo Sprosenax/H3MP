@@ -292,11 +292,11 @@ namespace H3MP.Patches
 
             ++patchIndex; // 18
             
- // SosigAwakePatch - Add TrackedSosig component immediately on spawn
-MethodInfo sosigAwakePatchOriginal = typeof(Sosig).GetMethod("Awake", BindingFlags.NonPublic | BindingFlags.Instance);
+// SosigAwakePatch - Add TrackedSosig component immediately on spawn
+MethodInfo sosigAwakePatchOriginal = typeof(Sosig).GetMethod("Configure", BindingFlags.Public | BindingFlags.Instance);
 MethodInfo sosigAwakePatchPostfix = typeof(SosigAwakePatch).GetMethod("Postfix", BindingFlags.NonPublic | BindingFlags.Static);
 
-Mod.LogInfo("Attempting to patch Sosig.Awake...", false);
+Mod.LogInfo("Attempting to patch Sosig.Configure...", false);
 Mod.LogInfo("sosigAwakePatchOriginal null?: " + (sosigAwakePatchOriginal == null), false);
 Mod.LogInfo("sosigAwakePatchPostfix null?: " + (sosigAwakePatchPostfix == null), false);
 
@@ -306,16 +306,16 @@ if (sosigAwakePatchOriginal != null && sosigAwakePatchPostfix != null)
     {
         PatchController.Verify(sosigAwakePatchOriginal, harmony, false);
         harmony.Patch(sosigAwakePatchOriginal, null, new HarmonyMethod(sosigAwakePatchPostfix));
-        Mod.LogInfo("Successfully patched Sosig.Awake", false);
+        Mod.LogInfo("Successfully patched Sosig.Configure", false);
     }
     catch (Exception ex)
     {
-        Mod.LogError("Failed to patch Sosig.Awake: " + ex.Message);
+        Mod.LogError("Failed to patch Sosig.Configure: " + ex.Message);
     }
 }
 else
 {
-    Mod.LogError("Sosig.Awake method not found, TrackedSosig timing issue WILL occur!");
+    Mod.LogError("Sosig.Configure method not found, TrackedSosig timing issue WILL occur!");
 }
 
             ++patchIndex; // 19
