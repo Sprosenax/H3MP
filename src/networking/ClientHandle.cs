@@ -2644,52 +2644,56 @@ namespace H3MP.Networking
             }
         }
 
-        public static void TNHHoldBeginChallenge(Packet packet)
+public static void TNHHoldBeginChallenge(Packet packet)
+{
+    int instance = packet.ReadInt();
+    bool fromController = packet.ReadBool();
+    Mod.LogInfo("TNHHoldBeginChallenge client handle", false);
+    
+    if (fromController)
+    {
+        if (GameManager.TNHInstances.TryGetValue(instance, out TNHInstance actualInstance))
         {
-            int instance = packet.ReadInt();
-            bool fromController = packet.ReadBool();
-            Mod.LogInfo("TNHHoldBeginChallenge client handle", false);
-            if (fromController)
+            actualInstance.holdOngoing = true;
+            Mod.currentTNHInstance.holdState = TNH_HoldPoint.HoldState.Beginning;
+
+            if (actualInstance.manager != null && actualInstance.manager.m_hasInit)
             {
-                if (GameManager.TNHInstances.TryGetValue(instance, out TNHInstance actualInstance))
-                {
-                    actualInstance.holdOngoing = true;
-                    Mod.currentTNHInstance.holdState = TNH_HoldPoint.HoldState.Beginning;
-
-                    if (actualInstance.manager != null && actualInstance.manager.m_hasInit)
-                    {
-                        // Begin hold on our side
-                        ++TNH_HoldPointPatch.beginHoldSendSkip;
-                        Mod.currentTNHInstance.manager.m_curHoldPoint.m_systemNode.m_hasActivated = true;
-                        Mod.currentTNHInstance.manager.m_curHoldPoint.m_systemNode.m_hasInitiatedHold = true;
-                        Mod.currentTNHInstance.manager.m_curHoldPoint.BeginHoldChallenge();
-                        --TNH_HoldPointPatch.beginHoldSendSkip;
-
-                        // TP to hold point
-                        if (!actualInstance.dead.Contains(GameManager.ID) || Mod.TNHOnDeathSpectate)
-                        {
-                            GM.CurrentMovementManager.TeleportToPoint(Mod.currentTNHInstance.manager.m_curHoldPoint.SpawnPoint_SystemNode.position, true);
-                        }
-                    }
-                }
+                // Begin hold on our side
+                ++TNH_HoldPointPatch.beginHoldSendSkip;
+                Mod.currentTNHInstance.manager.m_curHoldPoint.m_systemNode.m_hasActivated = true;
+                Mod.currentTNHInstance.manager.m_curHoldPoint.m_systemNode.m_hasInitiatedHold = true;
+                Mod.currentTNHInstance.manager.m_curHoldPoint.BeginHoldChallenge();
+                --TNH_HoldPointPatch.beginHoldSendSkip;
             }
-            else if (GameManager.TNHInstances.TryGetValue(instance, out TNHInstance actualInstance))
+            
+            // MOVE TELEPORT OUTSIDE - ALL PLAYERS SHOULD TELEPORT
+            if (!actualInstance.dead.Contains(GameManager.ID) || Mod.TNHOnDeathSpectate)
             {
-                if (actualInstance.controller == GameManager.ID)
-                {
-                    // We received order to begin hold and we are the controller, begin it
-                    Mod.currentTNHInstance.manager.m_curHoldPoint.m_systemNode.m_hasActivated = true;
-                    Mod.currentTNHInstance.manager.m_curHoldPoint.m_systemNode.m_hasInitiatedHold = true;
-                    Mod.currentTNHInstance.manager.m_curHoldPoint.BeginHoldChallenge();
-
-                    // TP to point since we are not the one who started the hold
-                    if (!actualInstance.dead.Contains(GameManager.ID) || Mod.TNHOnDeathSpectate)
-                    {
-                        GM.CurrentMovementManager.TeleportToPoint(Mod.currentTNHInstance.manager.m_curHoldPoint.SpawnPoint_SystemNode.position, true);
-                    }
-                }
+                GM.CurrentMovementManager.TeleportToPoint(Mod.currentTNHInstance.manager.m_curHoldPoint.SpawnPoint_SystemNode.position, true);
             }
         }
+    }
+    else
+    {
+        if (GameManager.TNHInstances.TryGetValue(instance, out TNHInstance actualInstance))
+        {
+            if (actualInstance.controller == GameManager.ID)
+            {
+                // We received order to begin hold and we are the controller, begin it
+                Mod.currentTNHInstance.manager.m_curHoldPoint.m_systemNode.m_hasActivated = true;
+                Mod.currentTNHInstance.manager.m_curHoldPoint.m_systemNode.m_hasInitiatedHold = true;
+                Mod.currentTNHInstance.manager.m_curHoldPoint.BeginHoldChallenge();
+            }
+            
+            // MOVE TELEPORT OUTSIDE - ALL PLAYERS SHOULD TELEPORT
+            if (!actualInstance.dead.Contains(GameManager.ID) || Mod.TNHOnDeathSpectate)
+            {
+                GM.CurrentMovementManager.TeleportToPoint(Mod.currentTNHInstance.manager.m_curHoldPoint.SpawnPoint_SystemNode.position, true);
+            }
+        }
+    }
+}
 
         public static void ShatterableCrateSetHoldingHealth(Packet packet)
         {
