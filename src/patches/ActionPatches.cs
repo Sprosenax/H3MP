@@ -1291,6 +1291,17 @@ static void Postfix(Sosig __instance)
         Mod.LogInfo($"SosigAwakePatch: Skipping - managerObject is null", false);
         return;
     }
+       // Skip if already tracked (network sosigs)
+    if (GameManager.trackedSosigBySosig.ContainsKey(__instance))
+    {
+        return;
+    }
+    
+    // Skip if component exists
+    if (__instance.GetComponent<TrackedSosig>() != null)
+    {
+        return;
+    }
     
     // Check if already tracked
     TrackedSosig existing = __instance.GetComponent<TrackedSosig>();
