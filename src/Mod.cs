@@ -1290,6 +1290,30 @@ public static void InitTNHUIManager(TNHInstance instance)
         return;
     }
 
+    Mod.currentTNHUIManager.OBS_Progression.SetSelectedButton(instance.progressionTypeSetting);
+    GM.TNHOptions.ProgressionTypeSetting = (TNHSetting_ProgressionType)instance.progressionTypeSetting;
+    Mod.currentTNHUIManager.OBS_EquipmentMode.SetSelectedButton(instance.equipmentModeSetting);
+    GM.TNHOptions.EquipmentModeSetting = (TNHSetting_EquipmentMode)instance.equipmentModeSetting;
+    Mod.currentTNHUIManager.OBS_HealthMode.SetSelectedButton(instance.healthModeSetting);
+    GM.TNHOptions.HealthModeSetting = (TNHSetting_HealthMode)instance.healthModeSetting;
+    Mod.currentTNHUIManager.OBS_TargetMode.SetSelectedButton(instance.targetModeSetting);
+    GM.TNHOptions.TargetModeSetting = (TNHSetting_TargetMode)instance.targetModeSetting;
+    Mod.currentTNHUIManager.OBS_AIDifficulty.SetSelectedButton(instance.AIDifficultyModifier);
+    GM.TNHOptions.AIDifficultyModifier = (TNHModifier_AIDifficulty)instance.AIDifficultyModifier;
+    Mod.currentTNHUIManager.OBS_AIRadarMode.SetSelectedButton(instance.radarModeModifier);
+    GM.TNHOptions.RadarModeModifier = (TNHModifier_RadarMode)instance.radarModeModifier;
+    Mod.currentTNHUIManager.OBS_ItemSpawner.SetSelectedButton(instance.itemSpawnerMode);
+    GM.TNHOptions.ItemSpawnerMode = (TNH_ItemSpawnerMode)instance.itemSpawnerMode;
+    Mod.currentTNHUIManager.OBS_Backpack.SetSelectedButton(instance.backpackMode);
+    GM.TNHOptions.BackpackMode = (TNH_BackpackMode)instance.backpackMode;
+    Mod.currentTNHUIManager.OBS_HealthMult.SetSelectedButton(instance.healthMult);
+    GM.TNHOptions.HealthMult = (TNH_HealthMult)instance.healthMult;
+    Mod.currentTNHUIManager.OBS_SosiggunReloading.SetSelectedButton(instance.sosiggunShakeReloading);
+    GM.TNHOptions.SosiggunShakeReloading = (TNH_SosiggunShakeReloading)instance.sosiggunShakeReloading;
+    Mod.currentTNHUIManager.OBS_RunSeed.SetSelectedButton(instance.TNHSeed + 1);
+    GM.TNHOptions.TNHSeed = instance.TNHSeed;
+    
+    
     // LOG WHICH COMPONENTS ARE MISSING
     if (Mod.currentTNHUIManager.OBS_Progression == null) Mod.LogWarning("OBS_Progression is null");
     if (Mod.currentTNHUIManager.OBS_EquipmentMode == null) Mod.LogWarning("OBS_EquipmentMode is null");
