@@ -2824,7 +2824,7 @@ namespace H3MP.Networking
             int instance = packet.ReadInt();
             int levelIndex = packet.ReadInt();
             int holdPointIndex = packet.ReadInt();
-            packet.Write(holdPosition);
+            Vector3 holdPosition = packet.ReadVector3();
             
             if (GameManager.TNHInstances.TryGetValue(instance, out TNHInstance actualInstance))
             {
