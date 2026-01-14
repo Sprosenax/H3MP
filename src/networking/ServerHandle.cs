@@ -2837,7 +2837,7 @@ namespace H3MP.Networking
                 }
             }
 
-            ServerSend.TNHHoldPointSystemNode(instance, levelIndex, holdPointIndex, clientID);
+            ServerSend.TNHHoldPointSystemNode(instance, levelIndex, holdPointIndex, holdPosition, clientID);
         }
 
 public static void TNHHoldBeginChallenge(int clientID, Packet packet)
