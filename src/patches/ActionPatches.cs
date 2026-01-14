@@ -329,7 +329,10 @@ else
 
             ++patchIndex; // 19
 
-            MethodInfo tryToFireGunOriginal = typeof(SosigWeapon).GetMethod("TryToFireGun", BindingFlags.Public | BindingFlags.Instance);
+
+            
+           MethodInfo tryToFireGunOriginal = typeof(SosigWeapon).GetMethods(BindingFlags.Public | BindingFlags.Instance)
+    .FirstOrDefault(m => m.Name == "TryToFireGun" && m.GetParameters().Length == 6);
 MethodInfo tryToFireGunPrefix = typeof(SosigWeaponTryToFireGunPatch).GetMethod("Prefix", BindingFlags.NonPublic | BindingFlags.Static);
 
 if (tryToFireGunOriginal != null && tryToFireGunPrefix != null)
@@ -5052,7 +5055,7 @@ static void SosigDiesPrefix(ref Sosig __instance, Damage.DamageClass damClass, S
             {
                 if (trackedSosig.data.trackedID == -1)
                 {
-                    TrackedSosig.unknownSetIFFs.Add(trackedSosig.data.localWaitingIndex, i);
+                    TrackedSosig.unknownSetIFFs[trackedSosig.data.localWaitingIndex] = i;
                 }
                 else
                 {
@@ -5087,7 +5090,7 @@ static void SosigDiesPrefix(ref Sosig __instance, Damage.DamageClass damClass, S
             {
                 if (trackedSosig.data.trackedID == -1)
                 {
-                    TrackedSosig.unknownSetOriginalIFFs.Add(trackedSosig.data.localWaitingIndex, i);
+TrackedSosig.unknownSetOriginalIFFs[trackedSosig.data.localWaitingIndex] = i;
                 }
                 else
                 {
