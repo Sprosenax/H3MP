@@ -2262,12 +2262,13 @@ namespace H3MP.Patches
 
                         if (ThreadManager.host)
                         {
-                            ServerSend.TNHHoldPointSystemNode(Mod.currentTNHInstance.instance, Mod.currentTNHInstance.level, holdPointIndex);
+                            Vector3 holdPos = __instance.SpawnPoint_SystemNode.position;
+                            ServerSend.TNHHoldPointSystemNode(Mod.currentTNHInstance.instance, Mod.currentTNHInstance.level, holdPointIndex, holdPos);
                         }
                         else
                         {
 
-                            ClientSend.TNHHoldPointSystemNode(Mod.currentTNHInstance.instance, Mod.currentTNHInstance.level, holdPointIndex);
+                            ClientSend.TNHHoldPointSystemNode(Mod.currentTNHInstance.instance, Mod.currentTNHInstance.level, holdPointIndex, holdPos);
                         }
                     }
                     else
