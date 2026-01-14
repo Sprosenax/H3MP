@@ -2840,63 +2840,63 @@ namespace H3MP.Networking
         }
 
         public static void TNHHoldBeginChallenge(int clientID, Packet packet)
+{
+    int instance = packet.ReadInt();
+    bool fromController = packet.ReadBool();
+    Mod.LogInfo("TNHHoldBeginChallenge server handle from "+clientID+" which is controller?: "+fromController+", for instance: "+instance, false);
+    
+    if (fromController)
+    {
+        if (GameManager.TNHInstances.TryGetValue(instance, out TNHInstance actualInstance))
         {
-            int instance = packet.ReadInt();
-            bool fromController = packet.ReadBool();
-            Mod.LogInfo("TNHHoldBeginChallenge server handle from "+clientID+" which is controller?: "+fromController+", for instance: "+instance, false);
-            if (fromController)
+            actualInstance.holdOngoing = true;
+            Mod.currentTNHInstance.holdState = TNH_HoldPoint.HoldState.Beginning;
+            
+            if (actualInstance.manager != null && actualInstance.manager.m_hasInit)
             {
-                if (GameManager.TNHInstances.TryGetValue(instance, out TNHInstance actualInstance))
+                // Begin hold on our side
+                ++TNH_HoldPointPatch.beginHoldSendSkip;
+                Mod.currentTNHInstance.manager.m_curHoldPoint.m_systemNode.m_hasActivated = true;
+                Mod.currentTNHInstance.manager.m_curHoldPoint.m_systemNode.m_hasInitiatedHold = true;
+                Mod.currentTNHInstance.manager.m_curHoldPoint.BeginHoldChallenge();
+                --TNH_HoldPointPatch.beginHoldSendSkip;
+                
+                // DON'T teleport here if WE are the starter (we're already there)
+                // But if controller received this from a client, controller should teleport
+                if (clientID != GameManager.ID)
                 {
-                    actualInstance.holdOngoing = true;
-                    Mod.currentTNHInstance.holdState = TNH_HoldPoint.HoldState.Beginning;
-
-                    if (actualInstance.manager != null && actualInstance.manager.m_hasInit)
-                    {
-                        // Begin hold on our side
-                        ++TNH_HoldPointPatch.beginHoldSendSkip;
-                        Mod.currentTNHInstance.manager.m_curHoldPoint.m_systemNode.m_hasActivated = true;
-                        Mod.currentTNHInstance.manager.m_curHoldPoint.m_systemNode.m_hasInitiatedHold = true;
-                        Mod.currentTNHInstance.manager.m_curHoldPoint.BeginHoldChallenge();
-                        --TNH_HoldPointPatch.beginHoldSendSkip;
-
-                        // TP to hold point
-                        if (!actualInstance.dead.Contains(GameManager.ID) || Mod.TNHOnDeathSpectate)
-                        {
-                            GM.CurrentMovementManager.TeleportToPoint(Mod.currentTNHInstance.manager.m_curHoldPoint.SpawnPoint_SystemNode.position, true);
-                        }
-                    }
-                }
-
-                // Pass it on
-                Mod.LogInfo("\tRelaying to all", false);
-                ServerSend.TNHHoldBeginChallenge(instance, true, true, clientID);
-            }
-            else if(GameManager.TNHInstances.TryGetValue(instance, out TNHInstance actualInstance))
-            {
-                if(actualInstance.controller == GameManager.ID)
-                {
-                    // We received order to begin hold and we are the controller, begin it
-                    Mod.currentTNHInstance.manager.m_curHoldPoint.m_systemNode.m_hasActivated = true;
-                    Mod.currentTNHInstance.manager.m_curHoldPoint.m_systemNode.m_hasInitiatedHold = true;
-                    Mod.currentTNHInstance.manager.m_curHoldPoint.BeginHoldChallenge();
-
-                    // TP to point since we are not the one who started the hold
                     if (!actualInstance.dead.Contains(GameManager.ID) || Mod.TNHOnDeathSpectate)
                     {
                         GM.CurrentMovementManager.TeleportToPoint(Mod.currentTNHInstance.manager.m_curHoldPoint.SpawnPoint_SystemNode.position, true);
                     }
-
-                    // Relay will be done by BeginHoldChallenge patch
-                }
-                else // We are not controller
-                {
-                    // Relay to controller
-                    Mod.LogInfo("\tRelaying to controller: "+ actualInstance.controller, false);
-                    ServerSend.TNHHoldBeginChallenge(instance, false, false, actualInstance.controller);
                 }
             }
         }
+        
+        // Pass it on to all clients, including the starter ID
+        Mod.LogInfo("\tRelaying to all, started by client: " + clientID, false);
+        ServerSend.TNHHoldBeginChallenge(instance, true, true, clientID, clientID); // clientID is the starter
+    }
+    else if(GameManager.TNHInstances.TryGetValue(instance, out TNHInstance actualInstance))
+    {
+        if(actualInstance.controller == GameManager.ID)
+        {
+            // We received order to begin hold and we are the controller, begin it
+            Mod.currentTNHInstance.manager.m_curHoldPoint.m_systemNode.m_hasActivated = true;
+            Mod.currentTNHInstance.manager.m_curHoldPoint.m_systemNode.m_hasInitiatedHold = true;
+            Mod.currentTNHInstance.manager.m_curHoldPoint.BeginHoldChallenge();
+            
+            // DON'T teleport - we're responding to a relay, the BeginHoldChallenge patch will handle broadcast
+            // The original starter (clientID) should not be teleported
+        }
+        else // We are not controller
+        {
+            // Relay to controller, preserve the original starter ID
+            Mod.LogInfo("\tRelaying to controller: "+ actualInstance.controller, false);
+            ServerSend.TNHHoldBeginChallenge(instance, false, false, actualInstance.controller, clientID); // clientID is still the starter
+        }
+    }
+}
 
         public static void TNHHoldPointRaiseBarriers(int clientID, Packet packet)
         {
