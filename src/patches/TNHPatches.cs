@@ -2308,6 +2308,13 @@ Vector3 holdPos = __instance.SpawnPoint_SystemNode.position;
         static bool BeginHoldPrefix(TNH_HoldPoint __instance, List<Sosig> ___m_activeSosigs, List<AutoMeater> ___m_activeTurrets, List<TNH_EncryptionTarget> ___m_activeTargets,
                                     ref int ___m_phaseIndex, ref int ___m_maxPhases, ref bool ___m_isInHold, ref int ___m_numWarnings)
         {
+               // ADD THESE DETAILED LOGS
+    Mod.LogInfo("=== BeginHoldPrefix CALLED ===", false);
+    Mod.LogInfo($"  Mod.managerObject null?: {Mod.managerObject == null}", false);
+    Mod.LogInfo($"  Mod.currentTNHInstance null?: {Mod.currentTNHInstance == null}", false);
+    Mod.LogInfo($"  ThreadManager.host: {ThreadManager.host}", false);
+    Mod.LogInfo($"  GameManager.ID: {GameManager.ID}", false); 
+            
             if (Mod.managerObject != null && Mod.currentTNHInstance != null)
             {
                 Mod.LogInfo("BeginHoldPrefix", false);
