@@ -1275,6 +1275,15 @@ else
 
             ++patchIndex; // 74
 
+// === DIAGNOSTIC CODE (NO patchIndex needed) ===
+Mod.LogInfo("=== TNH_HoldPoint Methods (Diagnostic) ===");
+MethodInfo[] methods = typeof(TNH_HoldPoint).GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+foreach (MethodInfo method in methods)
+{
+    Mod.LogInfo($"  Method: {method.Name}");
+}
+Mod.LogInfo("=== End TNH_HoldPoint Methods ===");
+            
             if (PatchController.MWAsmIdx != -1)
             {
                 // IModularWeaponPatch
