@@ -336,6 +336,17 @@ namespace H3MP.Patches
             harmony.Patch(TNH_HoldPointPatchSystemNodeOriginal, new HarmonyMethod(TNH_HoldPointPatchSystemNodePrefix));
             harmony.Patch(TNH_HoldPointPatchSpawnEntitiesOriginal, new HarmonyMethod(TNH_HoldPointPatchSpawnEntitiesPrefix));
             harmony.Patch(TNH_HoldPointPatchBeginHoldOriginal, new HarmonyMethod(TNH_HoldPointPatchBeginHoldPrefix));
+            Mod.LogInfo("=== VERIFYING BeginHoldChallenge PATCH ===");
+var patches = Harmony.GetPatchInfo(TNH_HoldPointPatchBeginHoldOriginal);
+if (patches != null && patches.Prefixes.Count > 0)
+{
+    Mod.LogInfo("✓ BeginHoldChallenge PREFIX ATTACHED SUCCESSFULLY");
+    Mod.LogInfo($"  Prefix count: {patches.Prefixes.Count}");
+}
+else
+{
+    Mod.LogError("✗ BeginHoldChallenge PREFIX FAILED TO ATTACH!");
+}
             harmony.Patch(TNH_HoldPointPatchRaiseRandomBarriersOriginal, new HarmonyMethod(TNH_HoldPointPatchRaiseRandomBarriersPrefix), new HarmonyMethod(TNH_HoldPointPatchRaiseRandomBarriersPostfix));
             harmony.Patch(TNH_HoldPointPatchRaiseSetCoverPointDataOriginal, new HarmonyMethod(TNH_HoldPointPatchRaiseSetCoverPointDataPrefix));
             harmony.Patch(TNH_HoldPointPatchCompletePhaseOriginal, new HarmonyMethod(TNH_HoldPointPatchCompletePhasePrefix));
