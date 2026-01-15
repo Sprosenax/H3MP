@@ -576,19 +576,30 @@ catch (Exception ex)
 
             ++patchIndex; // 32
 
-            // MG_SwarmDamageablePatch
-            MethodInfo MG_SwarmDamageablePatchFireOriginal = typeof(MG_FlyingHotDogSwarm).GetMethod("FireShot", BindingFlags.NonPublic | BindingFlags.Instance);
-            MethodInfo MG_SwarmDamageablePatchFireTranspiler = typeof(MG_SwarmDamageablePatch).GetMethod("FireTranspiler", BindingFlags.NonPublic | BindingFlags.Static);
-
+  // MG_SwarmDamageablePatch
+try
+{
+    Type swarmType = Type.GetType("FistVR.MG_FlyingHotDogSwarm, Assembly-CSharp");
+    if (swarmType != null)
+    {
+        MethodInfo MG_SwarmDamageablePatchFireOriginal = swarmType.GetMethod("FireShot", BindingFlags.NonPublic | BindingFlags.Instance);
+        MethodInfo MG_SwarmDamageablePatchFireTranspiler = typeof(MG_SwarmDamageablePatch).GetMethod("FireTranspiler", BindingFlags.NonPublic | BindingFlags.Static);
+        
+        if (MG_SwarmDamageablePatchFireOriginal != null)
+        {
             PatchController.Verify(MG_SwarmDamageablePatchFireOriginal, harmony, false);
-            try 
-            { 
-                harmony.Patch(MG_SwarmDamageablePatchFireOriginal, null, null, new HarmonyMethod(MG_SwarmDamageablePatchFireTranspiler));
-            }
-            catch (Exception ex)
-            {
-                Mod.LogError("Exception caught applying DamagePatches.MG_SwarmDamageablePatch: " + ex.Message + ":\n" + ex.StackTrace);
-            }
+            harmony.Patch(MG_SwarmDamageablePatchFireOriginal, null, null, new HarmonyMethod(MG_SwarmDamageablePatchFireTranspiler));
+        }
+    }
+    else
+    {
+        Mod.LogWarning("MG_FlyingHotDogSwarm not found - skipping patch (removed in H3VR 120)");
+    }
+}
+catch (Exception ex)
+{
+    Mod.LogError("Exception caught applying DamagePatches.MG_SwarmDamageablePatch: " + ex.Message + ":\n" + ex.StackTrace);
+}
 
             ++patchIndex; // 33
 
