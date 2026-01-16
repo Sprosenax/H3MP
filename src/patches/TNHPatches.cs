@@ -244,9 +244,6 @@ namespace H3MP.Patches
             // TNH_HoldPointPatch
             MethodInfo TNH_HoldPointPatchSpawnTargetGroupOriginal = null;
             MethodInfo TNH_HoldPointPatchSpawnTakeEnemyGroupOriginal = null;
-            MethodInfo TNH_HoldPointUpdateOriginal = typeof(TNH_HoldPoint).GetMethod("Update", BindingFlags.Public | BindingFlags.Instance);
-MethodInfo TNH_HoldPointUpdateExceptionHandler = typeof(TNH_HoldPointPatch).GetMethod("UpdateExceptionHandler", BindingFlags.NonPublic | BindingFlags.Static);
-MethodInfo TNH_HoldPointUpdatePostfix = typeof(TNH_HoldPointPatch).GetMethod("UpdatePostfix", BindingFlags.NonPublic | BindingFlags.Static);
             MethodInfo TNH_HoldPointPatchSpawnHoldEnemyGroupOriginal = null;
             MethodInfo TNH_HoldPointPatchSpawnTurretsOriginal = null;
             if (PatchController.TNHTweakerAsmIdx > -1)
@@ -275,7 +272,8 @@ try
     if (TNH_HoldPointPatchSystemNodeOriginal == null)
     {
         // Try old name for backwards compatibility
-        TNH_HoldPointPatchSystemNodeOriginal = holdPointType.GetMethod("ConfigureAsSystemNode", BindingFlags.Public | BindingFlags.Instance);
+        // ConfigureAsSystemNode has multiple overloads, get the one with 4 parameters
+TNH_HoldPointPatchSystemNodeOriginal = holdPointType.GetMethod("ConfigureAsSystemNode", BindingFlags.Public | BindingFlags.Instance, null, new Type[] { typeof(TNH_HoldChallenge), typeof(TNH_HoldChallenge), typeof(int), typeof(int) }, null);
     }
     
     if (TNH_HoldPointPatchSystemNodeOriginal != null)
