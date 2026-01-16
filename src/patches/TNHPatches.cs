@@ -2185,41 +2185,6 @@ TNH_HoldPointPatch.SafeConfigureSystemNode(
 
 // ===== H3VR 120 Compatibility Wrappers =====
 
-public static bool SafeHasGuardBeenKilledThatWasAltered(TNH_Manager manager)
-{
-    try
-    {
-        MethodInfo method = typeof(TNH_Manager).GetMethod("HasGuardBeenKilledThatWasAltered", BindingFlags.Public | BindingFlags.Instance);
-        if (method != null)
-        {
-            return (bool)method.Invoke(manager, null);
-        }
-        return false;
-    }
-    catch (Exception ex)
-    {
-        Mod.LogError("Exception calling HasGuardBeenKilledThatWasAltered: " + ex.Message);
-        return false;
-    }
-}
-
-public static bool SafeHasPlayerAlertedSecurityThisPhase(TNH_Manager manager)
-{
-    try
-    {
-        MethodInfo method = typeof(TNH_Manager).GetMethod("HasPlayerAlertedSecurityThisPhase", BindingFlags.Public | BindingFlags.Instance);
-        if (method != null)
-        {
-            return (bool)method.Invoke(manager, null);
-        }
-        return false;
-    }
-    catch (Exception ex)
-    {
-        Mod.LogError("Exception calling HasPlayerAlertedSecurityThisPhase: " + ex.Message);
-        return false;
-    }
-}
 
 public static bool SafeHasPlayerTakenDamageThisPhase(TNH_Manager manager)
 {
@@ -2519,8 +2484,7 @@ public static void SafeConfigureSystemNode(TNH_HoldPoint holdPoint, object takeC
                         {
                             Mod.currentTNHInstance.manager.IncrementScoringStat(TNH_Manager.ScoringEvent.TakeCompleteNoAlert, 1);
                         }
-                        if (!Mod.currentTNHInstance.manager.HasPlayerTakenDamageThisPhase())
-                        {
+if (!TNH_HoldPointPatch.SafeHasPlayerTakenDamageThisPhase(Mod.currentTNHInstance.manager))                        {
                             Mod.currentTNHInstance.manager.IncrementScoringStat(TNH_Manager.ScoringEvent.TakeCompleteNoDamage, 1);
                         }
 
