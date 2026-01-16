@@ -2260,14 +2260,14 @@ static void SafeBeginPhaseWithoutSystemNode(TNH_HoldPoint __instance)
             object holdChallenge = holdChallengeField.GetValue(__instance);
             
             PropertyInfo phasesProperty = holdChallenge.GetType().GetProperty("Phases");
-            if (phasesProperty != null)
-            {
-                var phases = phasesProperty.GetValue(holdChallenge) as System.Collections.IList;
-                if (phases != null && phaseIndex < phases.Count)
-                {
-                    curPhaseField.SetValue(__instance, phases[phaseIndex]);
-                }
-            }
+if (phasesProperty != null)
+{
+    var phases = phasesProperty.GetValue(holdChallenge, null) as System.Collections.IList;
+    if (phases != null && phaseIndex < phases.Count)
+    {
+        curPhaseField.SetValue(__instance, phases[phaseIndex]);
+    }
+}
         }
         
         // Refresh cover (this is safe to call)
