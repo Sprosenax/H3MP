@@ -1,4 +1,4 @@
-﻿using FistVR;
+using FistVR;
 using H3MP.Networking;
 using H3MP.Scripts;
 using H3MP.Tracking;
@@ -308,9 +308,9 @@ MethodInfo TNH_HoldPointPatchRaiseSetCoverPointDataPrefix = typeof(TNH_HoldPoint
 MethodInfo TNH_HoldPointPatchCompletePhaseOriginal = typeof(TNH_HoldPoint).GetMethod("CompletePhase", BindingFlags.NonPublic | BindingFlags.Instance);
 MethodInfo TNH_HoldPointPatchCompletePhasePrefix = typeof(TNH_HoldPointPatch).GetMethod("CompletePhasePrefix", BindingFlags.NonPublic | BindingFlags.Static);
 MethodInfo TNH_HoldPointPatchUpdateOriginal = typeof(TNH_HoldPoint).GetMethod("Update", BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null);
-MethodInfo TNH_HoldPointPatchUpdatePostfix = typeof(TNH_HoldPointPatch).GetMethod("UpdatePostfix", BindingFlags.NonPublic | BindingFlags.Static);
-MethodInfo TNH_HoldPointPatchUpdateExceptionHandler = typeof(TNH_HoldPointPatch).GetMethod("UpdateExceptionHandler", BindingFlags.NonPublic | BindingFlags.Static);
-MethodInfo TNH_HoldPointPatchBeginPhasePrefix = typeof(TNH_HoldPointPatch).GetMethod("BeginPhasePrefix", BindingFlags.NonPublic | BindingFlags.Static);
+//MethodInfo TNH_HoldPointPatchUpdatePostfix = typeof(TNH_HoldPointPatch).GetMethod("UpdatePostfix", BindingFlags.NonPublic | BindingFlags.Static);
+//MethodInfo TNH_HoldPointPatchUpdateExceptionHandler = typeof(TNH_HoldPointPatch).GetMethod("UpdateExceptionHandler", BindingFlags.NonPublic | BindingFlags.Static);
+//MethodInfo TNH_HoldPointPatchBeginPhasePrefix = typeof(TNH_HoldPointPatch).GetMethod("BeginPhasePrefix", BindingFlags.NonPublic | BindingFlags.Static);
 MethodInfo TNH_HoldPointPatchUpdatePrefix = typeof(TNH_HoldPointPatch).GetMethod("UpdatePrefix", BindingFlags.NonPublic | BindingFlags.Static);
 MethodInfo TNH_HoldPointPatchBeginAnalyzingOriginal = typeof(TNH_HoldPoint).GetMethod("BeginAnalyzing", BindingFlags.NonPublic | BindingFlags.Instance);
 MethodInfo TNH_HoldPointPatchBeginAnalyzingPostfix = typeof(TNH_HoldPointPatch).GetMethod("BeginAnalyzingPostfix", BindingFlags.NonPublic | BindingFlags.Static);
