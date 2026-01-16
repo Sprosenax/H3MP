@@ -260,7 +260,7 @@ namespace H3MP.Patches
                 TNH_HoldPointPatchSpawnHoldEnemyGroupOriginal = typeof(TNH_HoldPoint).GetMethod("SpawnHoldEnemyGroup", BindingFlags.NonPublic | BindingFlags.Instance);
                 TNH_HoldPointPatchSpawnTurretsOriginal = typeof(TNH_HoldPoint).GetMethod("SpawnTurrets", BindingFlags.NonPublic | BindingFlags.Instance);
             }
-          // ConfigureAsSystemNode was renamed to SpawnSystemNode in H3VR 120
+// ConfigureAsSystemNode was renamed to SpawnSystemNode in H3VR 120
 try
 {
     Type holdPointType = typeof(TNH_HoldPoint);
@@ -2184,7 +2184,7 @@ TNH_HoldPointPatch.SafeConfigureSystemNode(
         public static int beginHoldSendSkip;
         public static int beginPhaseSkip;
 // Helper method to configure system node (H3VR 120 compatibility)
-private static void SafeConfigureSystemNode(TNH_HoldPoint holdPoint, TNH_Progression.TakeChallenge takeChallenge, TNH_Progression.HoldChallenge holdChallenge, int numOverrideTokens)
+private static void SafeConfigureSystemNode(TNH_HoldPoint holdPoint, object takeChallenge, object holdChallenge, int numOverrideTokens)
 {
     try
     {
