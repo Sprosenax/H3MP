@@ -592,19 +592,30 @@ catch (Exception ex)
 
             ++patchIndex; // 33
 
-            // MG_JerryDamageablePatch
-            MethodInfo MG_JerryDamageablePatchFireOriginal = typeof(MG_JerryTheLemon).GetMethod("FireBolt", BindingFlags.NonPublic | BindingFlags.Instance);
-            MethodInfo MG_JerryDamageablePatchFireTranspiler = typeof(MG_JerryDamageablePatch).GetMethod("FireTranspiler", BindingFlags.NonPublic | BindingFlags.Static);
-
+// MG_JerryDamageablePatch
+try
+{
+    Type jerryType = Type.GetType("FistVR.MG_JerryTheLemon, Assembly-CSharp");
+    if (jerryType != null)
+    {
+        MethodInfo MG_JerryDamageablePatchFireOriginal = jerryType.GetMethod("FireBolt", BindingFlags.NonPublic | BindingFlags.Instance);
+        MethodInfo MG_JerryDamageablePatchFireTranspiler = typeof(MG_JerryDamageablePatch).GetMethod("FireTranspiler", BindingFlags.NonPublic | BindingFlags.Static);
+        
+        if (MG_JerryDamageablePatchFireOriginal != null)
+        {
             PatchController.Verify(MG_JerryDamageablePatchFireOriginal, harmony, false);
-            try
-            { 
-                harmony.Patch(MG_JerryDamageablePatchFireOriginal, null, null, new HarmonyMethod(MG_JerryDamageablePatchFireTranspiler));
-            }
-            catch (Exception ex)
-            {
-                Mod.LogError("Exception caught applying DamagePatches.MG_JerryDamageablePatch: " + ex.Message + ":\n" + ex.StackTrace);
-            }
+            harmony.Patch(MG_JerryDamageablePatchFireOriginal, null, null, new HarmonyMethod(MG_JerryDamageablePatchFireTranspiler));
+        }
+    }
+    else
+    {
+        Mod.LogWarning("MG_JerryTheLemon not found - skipping patch (removed in H3VR 120)");
+    }
+}
+catch (Exception ex)
+{
+    Mod.LogError("Exception caught applying DamagePatches.MG_JerryDamageablePatch: " + ex.Message + ":\n" + ex.StackTrace);
+}
 
             ++patchIndex; // 34
 
