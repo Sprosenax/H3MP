@@ -377,7 +377,9 @@ catch (Exception ex)
             harmony.Patch(TNH_HoldPointPatchUpdateOriginal, new HarmonyMethod(TNH_HoldPointPatchUpdatePrefix));
             harmony.Patch(TNH_HoldPointPatchBeginAnalyzingOriginal, null, new HarmonyMethod(TNH_HoldPointPatchBeginAnalyzingPostfix));
             harmony.Patch(TNH_HoldPointPatchBeginPhaseOriginal, new HarmonyMethod(TNH_HoldPointPatchBeginPhasePrefix), new HarmonyMethod(TNH_HoldPointPatchBeginPhasePostfix));
-            harmony.Patch(TNH_HoldPointUpdateOriginal, null, new HarmonyMethod(TNH_HoldPointUpdatePostfix), null, new HarmonyMethod(TNH_HoldPointUpdateExceptionHandler));
+            harmony.Patch(TNH_HoldPointUpdateOriginal, 
+    postfix: new HarmonyMethod(TNH_HoldPointUpdatePostfix), 
+    finalizer: new HarmonyMethod(TNH_HoldPointUpdateExceptionHandler));
             harmony.Patch(TNH_HoldPointPatchSpawnWarpInMarkersOriginal, new HarmonyMethod(TNH_HoldPointPatchSpawnWarpInMarkersPrefix));
             harmony.Patch(TNH_HoldPointPatchSpawnTargetGroupOriginal, new HarmonyMethod(TNH_HoldPointPatchSpawnTargetGroupPrefix));
             harmony.Patch(TNH_HoldPointPatchIdentifyEncryptionOriginal, null, new HarmonyMethod(TNH_HoldPointPatchIdentifyEncryptionPostfix));
@@ -2864,7 +2866,7 @@ static void UpdatePostfix(TNH_HoldPoint __instance)
             }
         }
     }
-    catch (Exception ex)
+    catch
     {
         // Silently fail - display text is not critical
     }
