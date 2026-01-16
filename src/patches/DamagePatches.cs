@@ -549,19 +549,30 @@ catch (Exception ex)
 
             ++patchIndex; // 31
 
-            // MF2_BearTrapDamageablePatch
-            MethodInfo MF2_BearTrapDamageablePatchSnapOriginal = typeof(MF2_BearTrapInteractionZone).GetMethod("SnapShut", BindingFlags.Public | BindingFlags.Instance);
-            MethodInfo MF2_BearTrapDamageablePatchSnapTranspiler = typeof(MF2_BearTrapDamageablePatch).GetMethod("SnapTranspiler", BindingFlags.NonPublic | BindingFlags.Static);
+// MF2_BearTrapDamageablePatch
+try
+{
+    Type mf2BearTrapType = Type.GetType("FistVR.MF2_BearTrapInteractionZone, Assembly-CSharp");
+    if (mf2BearTrapType != null)
+    {
+        MethodInfo MF2_BearTrapDamageablePatchOriginal = mf2BearTrapType.GetMethod("Damage", BindingFlags.Public | BindingFlags.Instance);
+        MethodInfo MF2_BearTrapDamageablePatchTranspiler = typeof(MF2_BearTrapDamageablePatch).GetMethod("Transpiler", BindingFlags.NonPublic | BindingFlags.Static);
 
-            PatchController.Verify(MF2_BearTrapDamageablePatchSnapOriginal, harmony, false);
-            try 
-            { 
-                harmony.Patch(MF2_BearTrapDamageablePatchSnapOriginal, null, null, new HarmonyMethod(MF2_BearTrapDamageablePatchSnapTranspiler));
-            }
-            catch (Exception ex)
-            {
-                Mod.LogError("Exception caught applying DamagePatches.MF2_BearTrapDamageablePatch: " + ex.Message + ":\n" + ex.StackTrace);
-            }
+        if (MF2_BearTrapDamageablePatchOriginal != null)
+        {
+            PatchController.Verify(MF2_BearTrapDamageablePatchOriginal, harmony, false);
+            harmony.Patch(MF2_BearTrapDamageablePatchOriginal, null, null, new HarmonyMethod(MF2_BearTrapDamageablePatchTranspiler));
+        }
+    }
+    else
+    {
+        Mod.LogWarning("MF2_BearTrapInteractionZone not found - skipping patch (H3VR 120 removed this type)");
+    }
+}
+catch (Exception ex)
+{
+    Mod.LogError("Exception caught applying DamagePatches.MF2_BearTrapDamageablePatch: " + ex.Message);
+}
 
             ++patchIndex; // 32
 
