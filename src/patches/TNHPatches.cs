@@ -291,6 +291,7 @@ catch (Exception ex)
 {
     Mod.LogError("Exception caught applying TNH_HoldPointPatch.ConfigureAsSystemNode: " + ex.Message);
 }
+            
             MethodInfo TNH_HoldPointPatchSpawnEntitiesOriginal = typeof(TNH_HoldPoint).GetMethod("SpawnTakeChallengeEntities", BindingFlags.NonPublic | BindingFlags.Instance);
             MethodInfo TNH_HoldPointPatchSpawnEntitiesPrefix = typeof(TNH_HoldPointPatch).GetMethod("SpawnTakeChallengeEntitiesPrefix", BindingFlags.NonPublic | BindingFlags.Static);
             MethodInfo TNH_HoldPointPatchBeginHoldOriginal = typeof(TNH_HoldPoint).GetMethod("BeginHoldChallenge", BindingFlags.Public | BindingFlags.Instance);
@@ -2184,7 +2185,7 @@ TNH_HoldPointPatch.SafeConfigureSystemNode(
         public static int beginHoldSendSkip;
         public static int beginPhaseSkip;
 // Helper method to configure system node (H3VR 120 compatibility)
-private static void SafeConfigureSystemNode(TNH_HoldPoint holdPoint, object takeChallenge, object holdChallenge, int numOverrideTokens)
+public static void SafeConfigureSystemNode(TNH_HoldPoint holdPoint, object takeChallenge, object holdChallenge, int numOverrideTokens)
 {
     try
     {
