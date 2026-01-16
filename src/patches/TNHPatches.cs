@@ -1271,7 +1271,7 @@ catch (Exception ex)
                         Mod.currentTNHInstance.phase = TNH_Phase.Take;
                         Mod.currentTNHInstance.manager.Phase = TNH_Phase.Take;
 
-                        Mod.currentTNHInstance.manager.ResetAlertedThisPhase();
+                    TNH_HoldPointPatch.SafeResetAlertedThisPhase(Mod.currentTNHInstance.manager);
                         Mod.currentTNHInstance.manager.ResetPlayerTookDamageThisPhase();
                         try
 {
@@ -2183,7 +2183,80 @@ TNH_HoldPointPatch.SafeConfigureSystemNode(
         public static int beginHoldSendSkip;
         public static int beginPhaseSkip;
 
+// ===== H3VR 120 Compatibility Wrappers =====
+
+public static bool SafeHasGuardBeenKilledThatWasAltered(TNH_Manager manager)
+{
+    try
+    {
+        MethodInfo method = typeof(TNH_Manager).GetMethod("HasGuardBeenKilledThatWasAltered", BindingFlags.Public | BindingFlags.Instance);
+        if (method != null)
+        {
+            return (bool)method.Invoke(manager, null);
+        }
+        return false;
+    }
+    catch (Exception ex)
+    {
+        Mod.LogError("Exception calling HasGuardBeenKilledThatWasAltered: " + ex.Message);
+        return false;
+    }
+}
+
 public static bool SafeHasPlayerAlertedSecurityThisPhase(TNH_Manager manager)
+{
+    try
+    {
+        MethodInfo method = typeof(TNH_Manager).GetMethod("HasPlayerAlertedSecurityThisPhase", BindingFlags.Public | BindingFlags.Instance);
+        if (method != null)
+        {
+            return (bool)method.Invoke(manager, null);
+        }
+        return false;
+    }
+    catch (Exception ex)
+    {
+        Mod.LogError("Exception calling HasPlayerAlertedSecurityThisPhase: " + ex.Message);
+        return false;
+    }
+}
+
+public static bool SafeHasPlayerTakenDamageThisPhase(TNH_Manager manager)
+{
+    try
+    {
+        MethodInfo method = typeof(TNH_Manager).GetMethod("HasPlayerTakenDamageThisPhase", BindingFlags.Public | BindingFlags.Instance);
+        if (method != null)
+        {
+            return (bool)method.Invoke(manager, null);
+        }
+        return false;
+    }
+    catch (Exception ex)
+    {
+        Mod.LogError("Exception calling HasPlayerTakenDamageThisPhase: " + ex.Message);
+        return false;
+    }
+}
+
+public static void SafeResetAlertedThisPhase(TNH_Manager manager)
+{
+    try
+    {
+        MethodInfo method = typeof(TNH_Manager).GetMethod("ResetAlertedThisPhase", BindingFlags.Public | BindingFlags.Instance);
+        if (method != null)
+        {
+            method.Invoke(manager, null);
+        }
+    }
+    catch (Exception ex)
+    {
+        Mod.LogError("Exception calling ResetAlertedThisPhase: " + ex.Message);
+    }
+}
+        
+        
+        public static bool SafeHasPlayerAlertedSecurityThisPhase(TNH_Manager manager)
 {
     try
     {
@@ -2456,7 +2529,7 @@ public static void SafeConfigureSystemNode(TNH_HoldPoint holdPoint, object takeC
                         Mod.currentTNHInstance.manager.m_miscEnemies.Clear();
 
                         Mod.currentTNHInstance.manager.ClearGuards();
-                        Mod.currentTNHInstance.manager.ResetAlertedThisPhase();
+TNH_HoldPointPatch.SafeResetAlertedThisPhase(Mod.currentTNHInstance.manager);
                         Mod.currentTNHInstance.manager.ResetPlayerTookDamageThisPhase();
                         try
 {
