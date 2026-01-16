@@ -2189,7 +2189,82 @@ TNH_HoldPointPatch.SafeConfigureSystemNode(
         public static int beginPhaseSkip;
 
 // ===== H3VR 120 Compatibility Wrappers =====
-static bool BeginPhasePrefix(TNH_HoldPoint __instance)
+
+        public static void SafeSetSystemNodeFlags(TNH_HoldPoint holdPoint, bool hasActivated, bool hasInitiatedHold)
+{
+    try
+    {
+        FieldInfo systemNodeField = typeof(TNH_HoldPoint).GetField("m_systemNode", BindingFlags.NonPublic | BindingFlags.Instance);
+        if (systemNodeField != null)
+        {
+            object systemNode = systemNodeField.GetValue(holdPoint);
+            if (systemNode != null)
+            {
+                Type systemNodeType = systemNode.GetType();
+                
+                FieldInfo hasActivatedField = systemNodeType.GetField("m_hasActivated", BindingFlags.Public | BindingFlags.Instance);
+                if (hasActivatedField != null)
+                {
+                    hasActivatedField.SetValue(systemNode, hasActivated);
+                }
+                
+                FieldInfo hasInitiatedField = systemNodeType.GetField("m_hasInitiatedHold", BindingFlags.Public | BindingFlags.Instance);
+                if (hasInitiatedField != null)
+                {
+                    hasInitiatedField.SetValue(systemNode, hasInitiatedHold);
+                }
+                
+                Mod.LogInfo("SafeSetSystemNodeFlags - Set flags successfully");
+            }
+            else
+            {
+                Mod.LogInfo("SafeSetSystemNodeFlags - m_systemNode is null (H3VR 120), skipping");
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        Mod.LogError("SafeSetSystemNodeFlags error: " + ex.Message);
+    }
+}
+
+// H3VR 120 compatibility - safely get system node spawn point
+public static Vector3 SafeGetSystemNodeSpawnPoint(TNH_HoldPoint holdPoint)
+{
+    try
+    {
+        FieldInfo systemNodeField = typeof(TNH_HoldPoint).GetField("m_systemNode", BindingFlags.NonPublic | BindingFlags.Instance);
+        if (systemNodeField != null)
+        {
+            object systemNode = systemNodeField.GetValue(holdPoint);
+            if (systemNode != null)
+            {
+                Type systemNodeType = systemNode.GetType();
+                PropertyInfo spawnPointProperty = systemNodeType.GetProperty("SpawnPoint_SystemNode", BindingFlags.Public | BindingFlags.Instance);
+                if (spawnPointProperty != null)
+                {
+                    Transform spawnPoint = spawnPointProperty.GetValue(systemNode, null) as Transform;
+                    if (spawnPoint != null)
+                    {
+                        Mod.LogInfo("SafeGetSystemNodeSpawnPoint - Got spawn point from system node");
+                        return spawnPoint.position;
+                    }
+                }
+            }
+        }
+        
+        // Fallback - use the hold point's own position
+        Mod.LogInfo("SafeGetSystemNodeSpawnPoint - Using hold point position as fallback");
+        return holdPoint.transform.position;
+    }
+    catch (Exception ex)
+    {
+        Mod.LogError("SafeGetSystemNodeSpawnPoint error: " + ex.Message);
+        return holdPoint.transform.position;
+    }
+}
+        
+        static bool BeginPhasePrefix(TNH_HoldPoint __instance)
 {
     try
     {
