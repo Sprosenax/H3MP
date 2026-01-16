@@ -310,7 +310,7 @@ MethodInfo TNH_HoldPointPatchCompletePhasePrefix = typeof(TNH_HoldPointPatch).Ge
 MethodInfo TNH_HoldPointPatchUpdateOriginal = typeof(TNH_HoldPoint).GetMethod("Update", BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null);
 //MethodInfo TNH_HoldPointPatchUpdatePostfix = typeof(TNH_HoldPointPatch).GetMethod("UpdatePostfix", BindingFlags.NonPublic | BindingFlags.Static);
 //MethodInfo TNH_HoldPointPatchUpdateExceptionHandler = typeof(TNH_HoldPointPatch).GetMethod("UpdateExceptionHandler", BindingFlags.NonPublic | BindingFlags.Static);
-//MethodInfo TNH_HoldPointPatchBeginPhasePrefix = typeof(TNH_HoldPointPatch).GetMethod("BeginPhasePrefix", BindingFlags.NonPublic | BindingFlags.Static);
+MethodInfo TNH_HoldPointPatchBeginPhasePrefix = typeof(TNH_HoldPointPatch).GetMethod("BeginPhasePrefix", BindingFlags.NonPublic | BindingFlags.Static);
 MethodInfo TNH_HoldPointPatchUpdatePrefix = typeof(TNH_HoldPointPatch).GetMethod("UpdatePrefix", BindingFlags.NonPublic | BindingFlags.Static);
 MethodInfo TNH_HoldPointPatchBeginAnalyzingOriginal = typeof(TNH_HoldPoint).GetMethod("BeginAnalyzing", BindingFlags.NonPublic | BindingFlags.Instance);
 MethodInfo TNH_HoldPointPatchBeginAnalyzingPostfix = typeof(TNH_HoldPointPatch).GetMethod("BeginAnalyzingPostfix", BindingFlags.NonPublic | BindingFlags.Static);
@@ -374,11 +374,11 @@ MethodInfo TNH_HoldPointPatchSpawnTurretsPostfix = typeof(TNH_HoldPointPatch).Ge
             harmony.Patch(TNH_HoldPointPatchRaiseRandomBarriersOriginal, new HarmonyMethod(TNH_HoldPointPatchRaiseRandomBarriersPrefix), new HarmonyMethod(TNH_HoldPointPatchRaiseRandomBarriersPostfix));
             harmony.Patch(TNH_HoldPointPatchRaiseSetCoverPointDataOriginal, new HarmonyMethod(TNH_HoldPointPatchRaiseSetCoverPointDataPrefix));
             harmony.Patch(TNH_HoldPointPatchCompletePhaseOriginal, new HarmonyMethod(TNH_HoldPointPatchCompletePhasePrefix));
-/*harmony.Patch(TNH_HoldPointPatchUpdateOriginal, 
-    prefix: new HarmonyMethod(TNH_HoldPointPatchUpdatePrefix),
-    postfix: new HarmonyMethod(TNH_HoldPointPatchUpdatePostfix), 
-    finalizer: new HarmonyMethod(TNH_HoldPointPatchUpdateExceptionHandler));
-           */ harmony.Patch(TNH_HoldPointPatchBeginAnalyzingOriginal, null, new HarmonyMethod(TNH_HoldPointPatchBeginAnalyzingPostfix));
+    //harmony.Patch(TNH_HoldPointPatchUpdateOriginal, 
+   // prefix: new HarmonyMethod(TNH_HoldPointPatchUpdatePrefix),
+   // postfix: new HarmonyMethod(TNH_HoldPointPatchUpdatePostfix), 
+   // finalizer: new HarmonyMethod(TNH_HoldPointPatchUpdateExceptionHandler));
+         harmony.Patch(TNH_HoldPointPatchBeginAnalyzingOriginal, null, new HarmonyMethod(TNH_HoldPointPatchBeginAnalyzingPostfix));
             harmony.Patch(TNH_HoldPointPatchBeginPhaseOriginal, new HarmonyMethod(TNH_HoldPointPatchBeginPhasePrefix), new HarmonyMethod(TNH_HoldPointPatchBeginPhasePostfix));
             harmony.Patch(TNH_HoldPointPatchSpawnWarpInMarkersOriginal, new HarmonyMethod(TNH_HoldPointPatchSpawnWarpInMarkersPrefix));
             harmony.Patch(TNH_HoldPointPatchSpawnTargetGroupOriginal, new HarmonyMethod(TNH_HoldPointPatchSpawnTargetGroupPrefix));
