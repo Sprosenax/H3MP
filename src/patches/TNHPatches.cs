@@ -209,6 +209,9 @@ Mod.LogInfo("TNH_ManagerGeneratePatrolOriginal null?: " + (TNH_ManagerGeneratePa
 MethodInfo TNHSupplyPointPatchSpawnTakeEnemyGroupOriginal = typeof(TNH_SupplyPoint).GetMethod("SpawnTakeEnemyGroup", BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null);
 MethodInfo TNHSupplyPointPatchSpawnDefensesOriginal = typeof(TNH_SupplyPoint).GetMethod("SpawnDefenses", BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null);
 MethodInfo TNHSupplyPointPatchSpawnBoxesOriginal = typeof(TNH_SupplyPoint).GetMethod("SpawnBoxes", BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(int), typeof(int), typeof(bool) }, null);
+                 Mod.LogInfo($"SpawnTakeEnemyGroup null?: {TNHSupplyPointPatchSpawnTakeEnemyGroupOriginal == null}");
+    Mod.LogInfo($"SpawnDefenses null?: {TNHSupplyPointPatchSpawnDefensesOriginal == null}");
+    Mod.LogInfo($"SpawnBoxes null?: {TNHSupplyPointPatchSpawnBoxesOriginal == null}");
                 PatchController.Verify(TNHSupplyPointPatchSpawnTakeEnemyGroupOriginal, harmony, false);
                 PatchController.Verify(TNHSupplyPointPatchSpawnDefensesOriginal, harmony, false);
                 PatchController.Verify(TNHSupplyPointPatchSpawnBoxesOriginal, harmony, false);
