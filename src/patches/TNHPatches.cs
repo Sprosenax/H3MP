@@ -250,6 +250,14 @@ Mod.LogInfo("Got Tick, about to get SetContactType");
     .GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
     .FirstOrDefault(m => m.Name == "SetContactType" && m.GetParameters().Length == 1);
             Mod.LogInfo("Got SetContactType successfully");
+            Mod.LogInfo("Got SetContactType successfully");
+
+Mod.LogInfo($"TAHReticleContactPatchTickOriginal null?: {TAHReticleContactPatchTickOriginal == null}");
+Mod.LogInfo($"TAHReticleContactPatchTickTranspiler null?: {TAHReticleContactPatchTickTranspiler == null}");
+Mod.LogInfo($"TAHReticleContactPatchSetContactTypePrefix null?: {TAHReticleContactPatchSetContactTypePrefix == null}");
+Mod.LogInfo($"TAHReticleContactPatchSetContactTypeOriginal null?: {TAHReticleContactPatchSetContactTypeOriginal == null}");
+
+Mod.LogInfo("About to verify Tick...");
             PatchController.Verify(TAHReticleContactPatchTickOriginal, harmony, false);
             try
             { 
