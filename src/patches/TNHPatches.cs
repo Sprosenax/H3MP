@@ -2653,30 +2653,60 @@ public static void SafeConfigureSystemNode(TNH_HoldPoint holdPoint, object takeC
 {
     try
     {
-        // Try new method first (H3VR 120+)
-        MethodInfo spawnMethod = typeof(TNH_HoldPoint).GetMethod("SpawnSystemNode", BindingFlags.Public | BindingFlags.Instance);
-        if (spawnMethod != null)
-        {
-            // SpawnSystemNode doesn't take parameters - it uses the hold point's configured values
-            spawnMethod.Invoke(holdPoint, null);
-            return;
-        }
-        
-        // Fall back to old method (pre-120)
+        // Get the ConfigureAsSystemNode method
         MethodInfo configureMethod = typeof(TNH_HoldPoint).GetMethod("ConfigureAsSystemNode", BindingFlags.Public | BindingFlags.Instance);
+        
         if (configureMethod != null)
         {
-            configureMethod.Invoke(holdPoint, new object[] { takeChallenge, holdChallenge, numOverrideTokens });
-            return;
+            ParameterInfo[] parameters = configureMethod.GetParameters();
+            
+            if (parameters.Length == 4)
+            {
+                // H3VR 120+ version with 4 parameters: (TNH_TakeChallenge t, TNH_HoldChallenge h, int reward, int level)
+                // We need to determine the level - use the hold point's current level or progression index
+                
+                int level = 0;
+                try
+                {
+                    // Try to get the current progression level from the TNH Manager
+                    FieldInfo curLevelField = typeof(TNH_Manager).GetField("m_curLevel", BindingFlags.NonPublic | BindingFlags.Instance);
+                    if (curLevelField != null && holdPoint.M != null)
+                    {
+                        level = (int)curLevelField.GetValue(holdPoint.M);
+                    }
+                }
+                catch
+                {
+                    level = 0; // Default to 0 if we can't get the level
+                }
+                
+                Mod.LogInfo($"Calling ConfigureAsSystemNode with 4 params: reward={numOverrideTokens}, level={level}");
+                configureMethod.Invoke(holdPoint, new object[] { takeChallenge, holdChallenge, numOverrideTokens, level });
+                return;
+            }
+            else if (parameters.Length == 3)
+            {
+                // H3VR 119 or earlier version with 3 parameters
+                Mod.LogInfo($"Calling ConfigureAsSystemNode with 3 params: numTokens={numOverrideTokens}");
+                configureMethod.Invoke(holdPoint, new object[] { takeChallenge, holdChallenge, numOverrideTokens });
+                return;
+            }
+            else
+            {
+                Mod.LogError($"ConfigureAsSystemNode has unexpected parameter count: {parameters.Length}");
+            }
         }
-        
-        Mod.LogError("Could not find ConfigureAsSystemNode or SpawnSystemNode method!");
+        else
+        {
+            Mod.LogError("Could not find ConfigureAsSystemNode method!");
+        }
     }
     catch (Exception ex)
     {
         Mod.LogError("Exception calling system node configuration: " + ex.Message + "\n" + ex.StackTrace);
     }
 }
+        
         public static bool inSpawnEnemyGroup;
         public static bool inSpawnTurrets;
 
