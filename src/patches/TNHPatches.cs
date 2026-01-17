@@ -5,6 +5,7 @@ using H3MP.Tracking;
 using HarmonyLib;
 using System;
 using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -232,7 +233,8 @@ Mod.LogInfo("About to get TAH_ReticleContact.Tick");
 MethodInfo TAHReticleContactPatchTickOriginal = typeof(TAH_ReticleContact).GetMethod("Tick", BindingFlags.Public | BindingFlags.Instance);
 Mod.LogInfo("Got Tick, about to get SetContactType");            
             MethodInfo TAHReticleContactPatchTickTranspiler = typeof(TAHReticleContactPatch).GetMethod("TickTranspiler", BindingFlags.NonPublic | BindingFlags.Static);
-MethodInfo TAHReticleContactPatchSetContactTypeOriginal = typeof(TAH_ReticleContact)
+            MethodInfo TAHReticleContactPatchSetContactTypePrefix = typeof(TAHReticleContactPatch).GetMethod("SetContactTypePrefix", BindingFlags.NonPublic | BindingFlags.Static);
+            MethodInfo TAHReticleContactPatchSetContactTypeOriginal = typeof(TAH_ReticleContact)
     .GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
     .FirstOrDefault(m => m.Name == "SetContactType" && m.GetParameters().Length == 1);
             Mod.LogInfo("Got SetContactType successfully");
