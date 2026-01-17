@@ -298,7 +298,7 @@ else
 }
 
 Mod.LogInfo("Getting SpawnTakeChallengeEntities...");
-MethodInfo TNH_HoldPointPatchSpawnEntitiesOriginal = typeof(TNH_HoldPoint).GetMethod("SpawnTakeChallengeEntities", BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null);
+MethodInfo TNH_HoldPointPatchSpawnEntitiesOriginal = typeof(TNH_HoldPoint).GetMethod("SpawnTakeChallengeEntities", BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(TNH_TakeChallenge) }, null);
 Mod.LogInfo("Getting SpawnEntitiesPrefix...");
 MethodInfo TNH_HoldPointPatchSpawnEntitiesPrefix = typeof(TNH_HoldPointPatch).GetMethod("SpawnTakeChallengeEntitiesPrefix", BindingFlags.NonPublic | BindingFlags.Static);
 Mod.LogInfo("Getting BeginHoldChallenge...");
@@ -306,13 +306,13 @@ MethodInfo TNH_HoldPointPatchBeginHoldOriginal = typeof(TNH_HoldPoint).GetMethod
 Mod.LogInfo("Getting BeginHoldPrefix...");
 MethodInfo TNH_HoldPointPatchBeginHoldPrefix = typeof(TNH_HoldPointPatch).GetMethod("BeginHoldPrefix", BindingFlags.NonPublic | BindingFlags.Static);
 Mod.LogInfo("Getting RaiseRandomBarriers...");
-MethodInfo TNH_HoldPointPatchRaiseRandomBarriersOriginal = typeof(TNH_HoldPoint).GetMethod("RaiseRandomBarriers", BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null);
+MethodInfo TNH_HoldPointPatchRaiseRandomBarriersOriginal = typeof(TNH_HoldPoint).GetMethod("RaiseRandomBarriers", BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(int) }, null);
 Mod.LogInfo("Getting RaiseRandomBarriersPrefix...");
 MethodInfo TNH_HoldPointPatchRaiseRandomBarriersPrefix = typeof(TNH_HoldPointPatch).GetMethod("RaiseRandomBarriersPrefix", BindingFlags.NonPublic | BindingFlags.Static);
 Mod.LogInfo("Getting RaiseRandomBarriersPostfix...");
 MethodInfo TNH_HoldPointPatchRaiseRandomBarriersPostfix = typeof(TNH_HoldPointPatch).GetMethod("RaiseRandomBarriersPostfix", BindingFlags.NonPublic | BindingFlags.Static);
 Mod.LogInfo("Getting SetCoverPointData...");
-MethodInfo TNH_HoldPointPatchRaiseSetCoverPointDataOriginal = typeof(TNH_DestructibleBarrierPoint).GetMethod("SetCoverPointData", BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null);
+MethodInfo TNH_HoldPointPatchRaiseSetCoverPointDataOriginal = typeof(TNH_DestructibleBarrierPoint).GetMethod("SetCoverPointData", BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(int) }, null);
 Mod.LogInfo("Getting BarrierSetCoverPointDataPrefix...");
 MethodInfo TNH_HoldPointPatchRaiseSetCoverPointDataPrefix = typeof(TNH_HoldPointPatch).GetMethod("BarrierSetCoverPointDataPrefix", BindingFlags.NonPublic | BindingFlags.Static);
 Mod.LogInfo("Getting CompletePhase...");
