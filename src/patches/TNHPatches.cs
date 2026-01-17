@@ -2237,20 +2237,76 @@ TNH_HoldPointPatch.SafeConfigureSystemNode(
 
 static bool UpdatePrefix(TNH_HoldPoint __instance)
 {
-    // If m_systemNode is null, we need to skip the SetDisplayString calls in Update
-    FieldInfo systemNodeField = typeof(TNH_HoldPoint).GetField("m_systemNode", BindingFlags.NonPublic | BindingFlags.Instance);
-    if (systemNodeField != null)
+    // Skip original Update for clients - we'll handle display text separately
+    if (Mod.managerObject != null && Mod.currentTNHInstance != null && Mod.currentTNHInstance.controller != GameManager.ID)
     {
-        object systemNode = systemNodeField.GetValue(__instance);
-        if (systemNode == null)
+        try
         {
-            // m_systemNode is null (H3VR 120), but we still need the rest of Update to run
-            // We'll use a Transpiler or just let it run and catch the specific error
-            // For now, let original Update run - we'll handle errors with a better approach
-            return true;
+            // Get m_isInHold field
+            FieldInfo isInHoldField = typeof(TNH_HoldPoint).GetField("m_isInHold", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (isInHoldField == null || !(bool)isInHoldField.GetValue(__instance))
+            {
+                return true; // Not in hold, run original
+            }
+            
+            // Client is in hold but doesn't have system node - skip original Update
+            // This prevents NullReferenceExceptions from m_systemNode being null
+            
+            // Update timers and warnings manually (the important stuff from Update)
+            FieldInfo tickDownField = typeof(TNH_HoldPoint).GetField("m_tickDownToIdentification", BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo tickDownFailureField = typeof(TNH_HoldPoint).GetField("m_tickDownToFailure", BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo hasWarning1Field = typeof(TNH_HoldPoint).GetField("m_hasPlayedTimeWarning1", BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo hasWarning2Field = typeof(TNH_HoldPoint).GetField("m_hasPlayedTimeWarning2", BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo numWarningsField = typeof(TNH_HoldPoint).GetField("m_numWarnings", BindingFlags.NonPublic | BindingFlags.Instance);
+            
+            bool hasWarning1 = hasWarning1Field != null && (bool)hasWarning1Field.GetValue(__instance);
+            bool hasWarning2 = hasWarning2Field != null && (bool)hasWarning2Field.GetValue(__instance);
+            int numWarnings = numWarningsField != null ? (int)numWarningsField.GetValue(__instance) : 0;
+            
+            switch (Mod.currentTNHInstance.holdState)
+            {
+                case TNH_HoldPoint.HoldState.Analyzing:
+                    if (tickDownField != null)
+                    {
+                        float tickDown = (float)tickDownField.GetValue(__instance);
+                        tickDown -= Time.deltaTime;
+                        tickDownField.SetValue(__instance, tickDown);
+                    }
+                    break;
+                    
+                case TNH_HoldPoint.HoldState.Hacking:
+                    if (tickDownFailureField != null)
+                    {
+                        float tickDownFailure = (float)tickDownFailureField.GetValue(__instance);
+                        tickDownFailure -= Time.deltaTime;
+                        
+                        if (!hasWarning1 && tickDownFailure < 60f && hasWarning1Field != null)
+                        {
+                            hasWarning1Field.SetValue(__instance, true);
+                            __instance.M.EnqueueLine(TNH_VoiceLineID.AI_Encryption_Reminder1);
+                        }
+                        if (!hasWarning2 && tickDownFailure < 30f && hasWarning2Field != null && numWarningsField != null)
+                        {
+                            hasWarning2Field.SetValue(__instance, true);
+                            __instance.M.EnqueueLine(TNH_VoiceLineID.AI_Encryption_Reminder2);
+                            numWarningsField.SetValue(__instance, numWarnings + 1);
+                        }
+                        
+                        tickDownFailureField.SetValue(__instance, tickDownFailure);
+                    }
+                    break;
+            }
+            
+            return false; // Skip original Update - we handled it manually
+        }
+        catch (Exception ex)
+        {
+            Mod.LogError("UpdatePrefix error: " + ex.Message);
+            return true; // If error, let original run
         }
     }
-    return true;
+    
+    return true; // Host runs original Update normally
 }
         
 public static void SafeSetDisplayString(TNH_HoldPoint holdPoint, string text)
@@ -2617,65 +2673,6 @@ public static void SafeConfigureSystemNode(TNH_HoldPoint holdPoint, object takeC
         public static bool inSpawnEnemyGroup;
         public static bool inSpawnTurrets;
 
-        static bool UpdatePrefix(ref TNH_HoldPoint __instance, bool ___m_isInHold, ref TNH_HoldPointSystemNode ___m_systemNode, ref bool ___m_hasPlayedTimeWarning1, ref bool ___m_hasPlayedTimeWarning2,
-                                 ref int ___m_numWarnings)
-        {
-            // Skip if connected, have TNH instance, and we are not controller
-            if (Mod.managerObject != null && ___m_isInHold && Mod.currentTNHInstance != null && Mod.currentTNHInstance.controller != GameManager.ID)
-            {
-                try
-                {
-                    switch (Mod.currentTNHInstance.holdState)
-                    {
-                        case TNH_HoldPoint.HoldState.Beginning:
-                            ___m_systemNode.SetDisplayString("SCANNING SYSTEM");
-                            break;
-                        case TNH_HoldPoint.HoldState.Analyzing:
-                            Mod.currentTNHInstance.tickDownToID -= Time.deltaTime;
-                            if (__instance.M.TargetMode == TNHSetting_TargetMode.NoTargets)
-                            {
-                                ___m_systemNode.SetDisplayString("ANALYZING " + __instance.FloatToTime(Mod.currentTNHInstance.tickDownToID, "0:00.00"));
-                            }
-                            else
-                            {
-                                ___m_systemNode.SetDisplayString("ANALYZING");
-                            }
-                            break;
-                        case TNH_HoldPoint.HoldState.Hacking:
-                            Mod.currentTNHInstance.tickDownToFailure -= Time.deltaTime;
-                            if (!___m_hasPlayedTimeWarning1 && Mod.currentTNHInstance.tickDownToFailure < 60f)
-                            {
-                                ___m_hasPlayedTimeWarning1 = true;
-                                __instance.M.EnqueueLine(TNH_VoiceLineID.AI_Encryption_Reminder1);
-                            }
-                            if (!___m_hasPlayedTimeWarning2 && Mod.currentTNHInstance.tickDownToFailure < 30f)
-                            {
-                                ___m_hasPlayedTimeWarning2 = true;
-                                __instance.M.EnqueueLine(TNH_VoiceLineID.AI_Encryption_Reminder2);
-                                ___m_numWarnings++;
-                            }
-                            ___m_systemNode.SetDisplayString("FAILURE IN: " + __instance.FloatToTime(Mod.currentTNHInstance.tickDownToFailure, "0:00.00"));
-                            break;
-                        case TNH_HoldPoint.HoldState.Transition:
-                            if (___m_systemNode != null)
-                            {
-                                ___m_systemNode.SetDisplayString("SCANNING SYSTEM");
-                            }
-                            break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Mod.LogError("Caught " + ex.Message + "\nIn Holdpoint patch update prefix\nDebug:");
-                    Mod.LogError("Hold state: " + Mod.currentTNHInstance.holdState);
-                    Mod.LogError("Instance M null?: " + (__instance.M == null));
-                    Mod.LogError("Sys node null?: " + (___m_systemNode == null));
-                }
-
-                return false;
-            }
-            return true;
-        }
 
         static void ConfigureAsSystemNodePrefix(ref TNH_HoldPoint __instance)
         {
