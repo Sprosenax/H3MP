@@ -2403,6 +2403,19 @@ public static Vector3 SafeGetSystemNodeSpawnPoint(TNH_HoldPoint holdPoint)
 {
     try
     {
+        // H3VR 120+: Try to get SpawnPoint_SystemNode directly from TNH_HoldPoint
+        FieldInfo spawnPointField = typeof(TNH_HoldPoint).GetField("SpawnPoint_SystemNode", BindingFlags.Public | BindingFlags.Instance);
+        if (spawnPointField != null)
+        {
+            Transform spawnPoint = spawnPointField.GetValue(holdPoint) as Transform;
+            if (spawnPoint != null)
+            {
+                Mod.LogInfo("SafeGetSystemNodeSpawnPoint - Got spawn point directly from hold point (H3VR 120)");
+                return spawnPoint.position;
+            }
+        }
+        
+        // Pre-120 fallback: Try old method via m_systemNode
         FieldInfo systemNodeField = typeof(TNH_HoldPoint).GetField("m_systemNode", BindingFlags.NonPublic | BindingFlags.Instance);
         if (systemNodeField != null)
         {
@@ -2416,21 +2429,21 @@ public static Vector3 SafeGetSystemNodeSpawnPoint(TNH_HoldPoint holdPoint)
                     Transform spawnPoint = spawnPointProperty.GetValue(systemNode, null) as Transform;
                     if (spawnPoint != null)
                     {
-                        Mod.LogInfo("SafeGetSystemNodeSpawnPoint - Got spawn point from system node");
+                        Mod.LogInfo("SafeGetSystemNodeSpawnPoint - Got spawn point from system node (pre-120)");
                         return spawnPoint.position;
                     }
                 }
             }
         }
         
-        // Fallback - use the hold point's own position
-        Mod.LogInfo("SafeGetSystemNodeSpawnPoint - Using hold point position as fallback");
-        return holdPoint.transform.position;
+        // Last resort - use hold point position with upward offset to avoid spawning in walls/floor
+        Mod.LogWarning("SafeGetSystemNodeSpawnPoint - Using hold point position as fallback with offset");
+        return holdPoint.transform.position + Vector3.up * 0.5f;
     }
     catch (Exception ex)
     {
         Mod.LogError("SafeGetSystemNodeSpawnPoint error: " + ex.Message);
-        return holdPoint.transform.position;
+        return holdPoint.transform.position + Vector3.up * 0.5f;
     }
 }
         
