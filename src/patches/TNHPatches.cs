@@ -370,6 +370,27 @@ Mod.LogInfo("Getting SpawnTurretsPostfix...");
 MethodInfo TNH_HoldPointPatchSpawnTurretsPostfix = typeof(TNH_HoldPointPatch).GetMethod("SpawnTurretsPostfix", BindingFlags.NonPublic | BindingFlags.Static);
 
 Mod.LogInfo("=== ALL METHOD DECLARATIONS COMPLETE ===");
+
+Mod.LogInfo("Checking for null methods...");
+
+Mod.LogInfo($"SpawnEntitiesOriginal null?: {TNH_HoldPointPatchSpawnEntitiesOriginal == null}");
+Mod.LogInfo($"BeginHoldOriginal null?: {TNH_HoldPointPatchBeginHoldOriginal == null}");
+Mod.LogInfo($"RaiseRandomBarriersOriginal null?: {TNH_HoldPointPatchRaiseRandomBarriersOriginal == null}");
+Mod.LogInfo($"RaiseSetCoverPointDataOriginal null?: {TNH_HoldPointPatchRaiseSetCoverPointDataOriginal == null}");
+Mod.LogInfo($"CompletePhaseOriginal null?: {TNH_HoldPointPatchCompletePhaseOriginal == null}");
+Mod.LogInfo($"UpdateOriginal null?: {TNH_HoldPointPatchUpdateOriginal == null}");
+Mod.LogInfo($"BeginAnalyzingOriginal null?: {TNH_HoldPointPatchBeginAnalyzingOriginal == null}");
+Mod.LogInfo($"SpawnWarpInMarkersOriginal null?: {TNH_HoldPointPatchSpawnWarpInMarkersOriginal == null}");
+Mod.LogInfo($"SpawnTargetGroupOriginal null?: {TNH_HoldPointPatchSpawnTargetGroupOriginal == null}");
+Mod.LogInfo($"IdentifyEncryptionOriginal null?: {TNH_HoldPointPatchIdentifyEncryptionOriginal == null}");
+Mod.LogInfo($"FailOutOriginal null?: {TNH_HoldPointPatchFailOutOriginal == null}");
+Mod.LogInfo($"BeginPhaseOriginal null?: {TNH_HoldPointPatchBeginPhaseOriginal == null}");
+Mod.LogInfo($"ShutDownHoldPointOriginal null?: {TNH_HoldPointPatchShutDownHoldPointOriginal == null}");
+Mod.LogInfo($"CompleteHoldOriginal null?: {TNH_HoldPointPatchCompleteHoldOriginal == null}");
+Mod.LogInfo($"SpawnTakeEnemyGroupOriginal null?: {TNH_HoldPointPatchSpawnTakeEnemyGroupOriginal == null}");
+Mod.LogInfo($"SpawnHoldEnemyGroupOriginal null?: {TNH_HoldPointPatchSpawnHoldEnemyGroupOriginal == null}");
+Mod.LogInfo($"SpawnTurretsOriginal null?: {TNH_HoldPointPatchSpawnTurretsOriginal == null}");
+
 Mod.LogInfo("Starting verification...");
 
 PatchController.Verify(TNH_HoldPointPatchSpawnEntitiesOriginal, harmony, true);
