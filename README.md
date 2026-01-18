@@ -3,6 +3,6 @@ currently:
 fixing sosig and encryption targets getting duped
 
 ## whats working
-holds
-sandbox
-sync
+holds,
+sandbox,
+sync,
