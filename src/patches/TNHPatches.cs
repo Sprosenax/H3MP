@@ -2080,7 +2080,48 @@ TNH_HoldPointPatch.SafeConfigureSystemNode(
                 Mod.TNHStartEquipButton = GameObject.Instantiate(Mod.TNHStartEquipButtonPrefab, GM.CurrentPlayerBody.Head);
                 Mod.TNHStartEquipButton.transform.GetChild(0).GetComponent<FVRPointableButton>().Button.onClick.AddListener(Mod.OnTNHSpawnStartEquipClicked);
             }
+}
+        public static void UpdateHostForJoiningPlayer(int joiningPlayerID)
+    {
+        Mod.LogInfo("UpdateHostForJoiningPlayer called for player " + joiningPlayerID);
+        
+        if (Mod.currentTNHInstance == null || Mod.currentTNHInstance.manager == null)
+        {
+            return;
         }
+
+        // Add joining player to radar if they're in currentlyPlaying
+        if (Mod.currentTNHInstance.currentlyPlaying.Contains(joiningPlayerID) && 
+            GameManager.players.TryGetValue(joiningPlayerID, out PlayerManager player))
+        {
+            switch (GameManager.radarMode)
+            {
+                case 0: // All
+                    player.reticleContact = Mod.currentTNHInstance.manager.TAHReticle.RegisterTrackedObject(
+                        player.head, 
+                        (TAH_ReticleContact.ContactType)(GameManager.radarColor ? 
+                            (player.IFF == GM.CurrentPlayerBody.GetPlayerIFF() ? -2 : -3) : 
+                            player.colorIndex - 4)
+                    );
+                    break;
+                case 1: // Friendly only
+                    if (player.IFF == GM.CurrentPlayerBody.GetPlayerIFF())
+                    {
+                        player.reticleContact = Mod.currentTNHInstance.manager.TAHReticle.RegisterTrackedObject(
+                            player.head,
+                            (TAH_ReticleContact.ContactType)(GameManager.radarColor ?
+                                (player.IFF == GM.CurrentPlayerBody.GetPlayerIFF() ? -2 : -3) :
+                                player.colorIndex - 4)
+                        );
+                    }
+                    break;
+            }
+        }
+
+        Mod.LogInfo("Player " + joiningPlayerID + " added to host's TNH radar");
+    }
+        
+        
 
         static bool InitBeginEquipPrefix()
         {
@@ -2747,15 +2788,17 @@ public static void SafeConfigureSystemNode(TNH_HoldPoint holdPoint, object takeC
                         // Update locally
                         Mod.currentTNHInstance.curHoldIndex = holdPointIndex;
                         Mod.currentTNHInstance.level = GM.TNH_Manager.m_level;
-
+Vector3 holdPos = __instance.SpawnPoint_SystemNode.position;
+                        
                         if (ThreadManager.host)
                         {
-                            ServerSend.TNHHoldPointSystemNode(Mod.currentTNHInstance.instance, Mod.currentTNHInstance.level, holdPointIndex);
+                            
+                            ServerSend.TNHHoldPointSystemNode(Mod.currentTNHInstance.instance, Mod.currentTNHInstance.level, holdPointIndex, holdPos);
                         }
                         else
                         {
 
-                            ClientSend.TNHHoldPointSystemNode(Mod.currentTNHInstance.instance, Mod.currentTNHInstance.level, holdPointIndex);
+                            ClientSend.TNHHoldPointSystemNode(Mod.currentTNHInstance.instance, Mod.currentTNHInstance.level, holdPointIndex, holdPos);
                         }
                     }
                     else
@@ -2783,6 +2826,19 @@ public static void SafeConfigureSystemNode(TNH_HoldPoint holdPoint, object takeC
         static bool BeginHoldPrefix(TNH_HoldPoint __instance, List<Sosig> ___m_activeSosigs, List<AutoMeater> ___m_activeTurrets, List<TNH_EncryptionTarget> ___m_activeTargets,
                                     ref int ___m_phaseIndex, ref int ___m_maxPhases, ref bool ___m_isInHold, ref int ___m_numWarnings)
         {
+    if (beginHoldSendSkip > 0)
+    {
+        Mod.LogWarning($"beginHoldSendSkip was stuck at {beginHoldSendSkip}, resetting to 0");
+        beginHoldSendSkip = 0;
+    }
+            
+                   // ADD THESE DETAILED LOGS
+    Mod.LogInfo("=== BeginHoldPrefix CALLED ===", false);
+    Mod.LogInfo($"  Mod.managerObject null?: {Mod.managerObject == null}", false);
+    Mod.LogInfo($"  Mod.currentTNHInstance null?: {Mod.currentTNHInstance == null}", false);
+    Mod.LogInfo($"  ThreadManager.host: {ThreadManager.host}", false);
+    Mod.LogInfo($"  GameManager.ID: {GameManager.ID}", false); 
+            
             if (Mod.managerObject != null && Mod.currentTNHInstance != null)
             {
                 Mod.LogInfo("BeginHoldPrefix", false);
@@ -2799,7 +2855,7 @@ public static void SafeConfigureSystemNode(TNH_HoldPoint holdPoint, object takeC
                         // Send update
                         if (ThreadManager.host)
                         {
-                            ServerSend.TNHHoldBeginChallenge(Mod.currentTNHInstance.instance, true, true, 0);
+                            ServerSend.TNHHoldBeginChallenge(Mod.currentTNHInstance.instance, true, true, 0, GameManager.ID);
                         }
                         else
                         {
@@ -2816,7 +2872,7 @@ public static void SafeConfigureSystemNode(TNH_HoldPoint holdPoint, object takeC
                         Mod.LogInfo("\t\tNot skipped, sending to controller: "+ Mod.currentTNHInstance.controller, false);
                         if (ThreadManager.host)
                         {
-                            ServerSend.TNHHoldBeginChallenge(Mod.currentTNHInstance.instance, false, false, Mod.currentTNHInstance.controller);
+                            ServerSend.TNHHoldBeginChallenge(Mod.currentTNHInstance.instance, false, false, Mod.currentTNHInstance.controller, GameManager.ID);
                         }
                         else
                         {
@@ -3841,7 +3897,7 @@ static string FormatTime(float seconds)
         static bool LoadMGPrefix(SceneLoader __instance)
         {
             // If we are in a TNH instance hosted by a spectator host but spectator host is not yet in the game
-            if (Mod.managerObject != null && !GameManager.spectatorHost && !GameManager.sceneLoading && GameManager.scene.Equals("TakeAndHold_Lobby_2") && 
+            if (Mod.managerObject != null && !GameManager.spectatorHost && !GameManager.sceneLoading && GameManager.scene.Contains("Lobby") && GameManager.scene.StartsWith("TakeAndHold") && 
                 Mod.currentTNHInstance != null && Mod.currentTNHInstance.playerIDs.Count > 0 && GameManager.spectatorHosts.Contains(Mod.currentTNHInstance.playerIDs[0]) &&
                 !Mod.currentTNHInstance.currentlyPlaying.Contains(Mod.currentTNHInstance.playerIDs[0]))
             {

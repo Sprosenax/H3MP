@@ -2824,7 +2824,8 @@ namespace H3MP.Networking
             int instance = packet.ReadInt();
             int levelIndex = packet.ReadInt();
             int holdPointIndex = packet.ReadInt();
-
+            Vector3 holdPosition = packet.ReadVector3();
+            
             if (GameManager.TNHInstances.TryGetValue(instance, out TNHInstance actualInstance))
             {
                 actualInstance.curHoldIndex = holdPointIndex;
@@ -2836,7 +2837,7 @@ namespace H3MP.Networking
                 }
             }
 
-            ServerSend.TNHHoldPointSystemNode(instance, levelIndex, holdPointIndex, clientID);
+            ServerSend.TNHHoldPointSystemNode(instance, levelIndex, holdPointIndex, holdPosition, clientID);
         }
 
     public static void TNHHoldBeginChallenge(int clientID, Packet packet)
@@ -4703,7 +4704,7 @@ Mod.currentTNHInstance.manager.HoldPoints[Mod.currentTNHInstance.curHoldIndex].B
                     }
                     else
                     {
-                        if (GameManager.scene.Equals("TakeAndHold_Lobby_2"))
+if (GameManager.scene.Contains("Lobby") && GameManager.scene.StartsWith("TakeAndHold"))
                         {
                             Mod.OnTNHHostClicked();
                             Mod.TNHOnDeathSpectate = packet.ReadBool();

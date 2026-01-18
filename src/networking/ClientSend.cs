@@ -1565,13 +1565,14 @@ namespace H3MP.Networking
             }
         }
 
-        public static void TNHHoldPointSystemNode(int instance, int levelIndex, int holdPointIndex)
+        public static void TNHHoldPointSystemNode(int instance, int levelIndex, int holdPointIndex, Vector3 holdPosition)
         {
             using (Packet packet = new Packet((int)ClientPackets.TNHHoldPointSystemNode))
             {
                 packet.Write(instance);
                 packet.Write(levelIndex);
                 packet.Write(holdPointIndex);
+                packet.Write(holdPosition);
 
                 SendTCPData(packet);
             }

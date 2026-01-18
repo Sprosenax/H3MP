@@ -305,7 +305,7 @@ namespace H3MP.Patches
                         bool found = false;
                         if (TrackedSosig.unknownItemInteract.TryGetValue(trackedSosig.data.localWaitingIndex, out List<KeyValuePair<int, KeyValuePair<TrackedItemData, int>>> interactions))
                         {
-                            for (int i = interactions.Count; i >= 0; --i)
+                            for (int i = interactions.Count; i > 0; --i)
                             {
                                 // If the interaction is pickup of the same hand
                                 if (interactions[i].Key == 0 && interactions[i].Value.Value == handIndex)

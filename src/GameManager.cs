@@ -667,6 +667,14 @@ namespace H3MP
             {
                 playersPresent.Add(playerID);
             }
+        
+            if (Mod.currentTNHInstance != null && 
+        Mod.currentTNHInstance.instance == instance && 
+        Mod.currentTNHInstance.manager != null)
+    {
+        TNH_ManagerPatch.UpdateHostForJoiningPlayer(playerID);
+    }
+        
         }
 
         public static bool UpdatePlayerHidden(PlayerManager player)
@@ -878,6 +886,14 @@ namespace H3MP
 
                     Mod.currentTNHInstancePlayers.Add(playerID, newPlayerElement);
                 }
+            
+                // Update host's TNH state for this joining player
+    if (Mod.currentTNHInstance != null && 
+        Mod.currentTNHInstance.instance == instance && 
+        Mod.currentTNHInstance.manager != null)
+    {
+        TNH_ManagerPatch.UpdateHostForJoiningPlayer(playerID);
+    }   
             }
         }
 
@@ -1373,12 +1389,22 @@ namespace H3MP
                 }
                 else
                 {
-                    Mod.currentTNHUIManager = GameObject.FindObjectOfType<TNH_UIManager>();
-                    Mod.currentTNHSceneLoader = GameObject.FindObjectOfType<SceneLoader>();
-                    if (Mod.currentTNHUIManager != null)
-                    {
-                        Mod.InitTNHUIManager(TNHInstances[instance]);
-                    }
+Mod.currentTNHUIManager = GameObject.FindObjectOfType<TNH_UIManager>();
+
+// Only look for SceneLoader in actual TNH game scenes, not lobby
+if (!GameManager.scene.Contains("Lobby"))
+{
+    Mod.currentTNHSceneLoader = GameObject.FindObjectOfType<SceneLoader>(); // true = include inactive
+}
+else
+{
+    Mod.currentTNHSceneLoader = null;
+}
+
+if (Mod.currentTNHUIManager != null)
+{
+    Mod.InitTNHUIManager(TNHInstances[instance]);
+}
                 }
             }
 
@@ -1848,7 +1874,7 @@ namespace H3MP
 
                         if (Mod.spectatorHostWaitingForTNHSetup)
                         {
-                            if (scene.Equals("TakeAndHold_Lobby_2"))
+if (scene.Contains("Lobby") && scene.StartsWith("TakeAndHold"))
                             {
                                 if (spectatorHostControlledBy != -1)
                                 {

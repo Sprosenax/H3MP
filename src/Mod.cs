@@ -745,6 +745,7 @@ namespace H3MP
                                     }
                                 }
                                 break;
+                        
                         }
                     }
                 }
@@ -1174,9 +1175,61 @@ namespace H3MP
             currentButton.MaxPointingRange = 5;
             currentButton.Button.onClick.AddListener(OnTNHRequestHostWaitingCancelClicked);
 
-            // Get ref to the UI Manager
-            Mod.currentTNHUIManager = GameObject.FindObjectOfType<TNH_UIManager>();
-            Mod.currentTNHSceneLoader = GameObject.FindObjectOfType<SceneLoader>();
+Mod.currentTNHUIManager = GameObject.FindObjectOfType<TNH_UIManager>();
+
+// Only look for SceneLoader in actual TNH game scenes, not lobby
+if (!GameManager.scene.Contains("Lobby"))
+{
+    Mod.currentTNHSceneLoader = GameObject.FindObjectOfType<SceneLoader>(); // true = include inactive
+    Mod.LogInfo("Looking for SceneLoader: " + (Mod.currentTNHSceneLoader != null));
+}
+else
+{
+    Mod.currentTNHSceneLoader = null;
+    Mod.LogInfo("In TNH lobby, SceneLoader not needed");
+}
+
+if (Mod.currentTNHSceneLoader == null)
+{
+    // Try alternative methods
+    SceneLoader[] allLoaders = GameObject.FindObjectsOfType<SceneLoader>();
+    Mod.LogInfo("Total SceneLoaders found: " + allLoaders.Length);
+}
+
+// Debug logging to see what we found
+Mod.LogInfo($"TNH Scene Initialization:");
+Mod.LogInfo($"  currentTNHUIManager: {Mod.currentTNHUIManager != null}");
+Mod.LogInfo($"  currentTNHSceneLoader: {Mod.currentTNHSceneLoader != null}");
+
+// If SceneLoader is null, try alternative methods to find it
+if (Mod.currentTNHSceneLoader == null)
+{
+    Mod.LogWarning("SceneLoader not found via FindObjectOfType, searching alternatives...");
+    
+    // Try finding it as a child of the UI Manager
+    if (Mod.currentTNHUIManager != null)
+    {
+        Mod.currentTNHSceneLoader = Mod.currentTNHUIManager.GetComponentInChildren<SceneLoader>();
+        Mod.LogInfo($"  Found via GetComponentInChildren: {Mod.currentTNHSceneLoader != null}");
+    }
+    
+    // Try finding all SceneLoaders in the scene
+    if (Mod.currentTNHSceneLoader == null)
+    {
+        SceneLoader[] allLoaders = GameObject.FindObjectsOfType<SceneLoader>();
+        Mod.LogInfo($"  Total SceneLoaders in scene: {allLoaders.Length}");
+        if (allLoaders.Length > 0)
+        {
+            Mod.currentTNHSceneLoader = allLoaders[0];
+            Mod.LogInfo($"  Using first SceneLoader found");
+        }
+    }
+}
+
+if (Mod.currentTNHSceneLoader == null)
+{
+    Mod.LogError("CRITICAL: Could not find SceneLoader in TNH scene! This may cause synchronization issues.");
+}
 
             // If already in a TNH instance, which could be the case if we are coming back from being in game
             if (currentTNHInstance != null)
@@ -1610,7 +1663,7 @@ namespace H3MP
 
             Server.Start((ushort)config["MaxClientCount"], (ushort)config["Port"], (int)config["TickRate"]);
 
-            if (GameManager.scene.Equals("TakeAndHold_Lobby_2"))
+if (GameManager.scene.Contains("Lobby") && GameManager.scene.StartsWith("TakeAndHold"))
             {
                 LogInfo("Just connected in TNH lobby, initializing H3MP menu");
                 InitTNHMenu();
@@ -1668,7 +1721,7 @@ namespace H3MP
 
             client.ConnectToServer();
 
-            if (GameManager.scene.Equals("TakeAndHold_Lobby_2"))
+if (GameManager.scene.Contains("Lobby") && GameManager.scene.StartsWith("TakeAndHold"))
             {
                 LogInfo("Just connected in TNH lobby, initializing H3MP menu");
                 InitTNHMenu();
@@ -1805,8 +1858,7 @@ namespace H3MP
                 TNHMenuPages[2].SetActive(false);
 
                 // Handle joining instance success/fail
-                if (SetTNHInstance(GameManager.TNHInstances[TNHHostedInstance]))
-                {
+if (SetTNHInstance(GameManager.TNHInstances[TNHHostedInstance]))                {
                     TNHMenuPages[4].SetActive(true);
 
                     TNHStatusText.text = "Client in TNH game";

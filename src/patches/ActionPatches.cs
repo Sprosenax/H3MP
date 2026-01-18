@@ -1,9 +1,10 @@
-﻿using FistVR;
+using FistVR;
 using H3MP.Networking;
 using H3MP.Scripts;
 using H3MP.Tracking;
 using HarmonyLib;
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -271,7 +272,7 @@ namespace H3MP.Patches
 
             PatchController.Verify(remoteMissileDetonatePatchOriginal, harmony, false);
             harmony.Patch(remoteMissileDetonatePatchOriginal, new HarmonyMethod(remoteMissileDetonatePatchPrefix));
-
+        
             ++patchIndex; // 16
 
             // StingerMissileExplodePatch
@@ -291,7 +292,35 @@ namespace H3MP.Patches
             harmony.Patch(sosigWeaponShatterPatchOriginal, new HarmonyMethod(sosigWeaponShatterPatchPrefix));
 
             ++patchIndex; // 18
+            
+// SosigAwakePatch - Add TrackedSosig component immediately on spawn
+MethodInfo sosigAwakePatchOriginal = typeof(Sosig).GetMethod("Configure", BindingFlags.Public | BindingFlags.Instance);
+MethodInfo sosigAwakePatchPostfix = typeof(SosigAwakePatch).GetMethod("Postfix", BindingFlags.NonPublic | BindingFlags.Static);
 
+Mod.LogInfo("Attempting to patch Sosig.Configure...", false);
+Mod.LogInfo("sosigAwakePatchOriginal null?: " + (sosigAwakePatchOriginal == null), false);
+Mod.LogInfo("sosigAwakePatchPostfix null?: " + (sosigAwakePatchPostfix == null), false);
+
+if (sosigAwakePatchOriginal != null && sosigAwakePatchPostfix != null)
+{
+    try
+    {
+        PatchController.Verify(sosigAwakePatchOriginal, harmony, false);
+        harmony.Patch(sosigAwakePatchOriginal, null, new HarmonyMethod(sosigAwakePatchPostfix));
+        Mod.LogInfo("Successfully patched Sosig.Configure", false);
+    }
+    catch (Exception ex)
+    {
+        Mod.LogError("Failed to patch Sosig.Configure: " + ex.Message);
+    }
+}
+else
+{
+    Mod.LogError("Sosig.Configure method not found, TrackedSosig timing issue WILL occur!");
+}
+
+            ++patchIndex; // 19
+            
             // SosigConfigurePatch
             MethodInfo sosigConfigurePatchOriginal = typeof(Sosig).GetMethod("Configure", BindingFlags.Public | BindingFlags.Instance);
             MethodInfo sosigConfigurePatchPrefix = typeof(SosigConfigurePatch).GetMethod("Prefix", BindingFlags.NonPublic | BindingFlags.Static);
@@ -300,6 +329,32 @@ namespace H3MP.Patches
             harmony.Patch(sosigConfigurePatchOriginal, new HarmonyMethod(sosigConfigurePatchPrefix));
 
             ++patchIndex; // 19
+
+
+            
+           MethodInfo tryToFireGunOriginal = typeof(SosigWeapon).GetMethods(BindingFlags.Public | BindingFlags.Instance)
+    .FirstOrDefault(m => m.Name == "TryToFireGun" && m.GetParameters().Length == 6);
+MethodInfo tryToFireGunPrefix = typeof(SosigWeaponTryToFireGunPatch).GetMethod("Prefix", BindingFlags.NonPublic | BindingFlags.Static);
+
+if (tryToFireGunOriginal != null && tryToFireGunPrefix != null)
+{
+    try
+    {
+        PatchController.Verify(tryToFireGunOriginal, harmony, false);
+        harmony.Patch(tryToFireGunOriginal, new HarmonyMethod(tryToFireGunPrefix));
+        Mod.LogInfo("Successfully patched SosigWeapon.TryToFireGun", false);
+    }
+    catch (Exception ex)
+    {
+        Mod.LogError("Failed to patch SosigWeapon.TryToFireGun: " + ex.Message);
+    }
+}
+else
+{
+    Mod.LogError("SosigWeapon.TryToFireGun method not found!");
+}
+
+++patchIndex; // 19
 
             // SosigUpdatePatch
             MethodInfo sosigUpdatePatchOriginal = typeof(Sosig).GetMethod("Update", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -1220,6 +1275,15 @@ namespace H3MP.Patches
 
             ++patchIndex; // 74
 
+// === DIAGNOSTIC CODE (NO patchIndex needed) ===
+Mod.LogInfo("=== TNH_HoldPoint Methods (Diagnostic) ===");
+MethodInfo[] methods = typeof(TNH_HoldPoint).GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+foreach (MethodInfo method in methods)
+{
+    Mod.LogInfo($"  Method: {method.Name}");
+}
+Mod.LogInfo("=== End TNH_HoldPoint Methods ===");
+            
             if (PatchController.MWAsmIdx != -1)
             {
                 // IModularWeaponPatch
@@ -1251,7 +1315,56 @@ namespace H3MP.Patches
         }
     }
 
-
+    // Patches Sosig.Awake to add TrackedSosig component immediately
+    class SosigAwakePatch
+    {
+static void Postfix(Sosig __instance)
+{
+    Mod.LogInfo($"SosigAwakePatch.Postfix called for {__instance.name}", false);
+    
+    if (Mod.managerObject == null)
+    {
+        Mod.LogInfo($"SosigAwakePatch: Skipping - managerObject is null", false);
+        return;
+    }
+    // Skip if already in dictionary (network sosigs)
+    if (GameManager.trackedSosigBySosig.ContainsKey(__instance))
+    {
+        Mod.LogInfo($"SosigAwakePatch: {__instance.name} already in dictionary", false);
+        return;
+    }
+    
+    // Check if already has component
+    TrackedSosig existing = __instance.GetComponent<TrackedSosig>();
+    if (existing != null)
+    {
+        Mod.LogInfo($"SosigAwakePatch: {__instance.name} already has component", false);
+        return;
+    }
+    
+    // Call MakeTracked via reflection to properly initialize everything
+    try
+    {
+        Type trackedSosigDataType = typeof(TrackedSosigData);
+        System.Reflection.MethodInfo makeTrackedMethod = trackedSosigDataType.GetMethod("MakeTracked", 
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        
+        if (makeTrackedMethod != null)
+        {
+            TrackedSosig trackedSosig = (TrackedSosig)makeTrackedMethod.Invoke(null, new object[] { __instance.transform, null });
+            Mod.LogInfo($"SosigAwakePatch: Successfully tracked {__instance.name}", false);
+        }
+        else
+        {
+            Mod.LogError("SosigAwakePatch: MakeTracked method not found!");
+        }
+    }
+    catch (System.Exception ex)
+    {
+        Mod.LogError($"SosigAwakePatch: Exception: {ex.Message}");
+    }
+}
+    }
 
     // Patches ModularWeaponPart
     class ModularWeaponPartPatch
@@ -3823,6 +3936,18 @@ namespace H3MP.Patches
         }
     }
 
+class SosigWeaponTryToFireGunPatch
+{
+    static bool Prefix(SosigWeapon __instance)
+    {
+        if (__instance == null || __instance.transform == null)
+        {
+            return false;
+        }
+        return true;
+    }
+}
+
     // Patches Sosig update methods to prevent processing on non controlling client
     class SosigUpdatePatch
     {
@@ -3927,37 +4052,44 @@ namespace H3MP.Patches
         public static int sosigRequestHitDecalSkip;
         public static int skipSendingOrder;
 
-        static void SosigDiesPrefix(ref Sosig __instance, Damage.DamageClass damClass, Sosig.SosigDeathType deathType)
+static void SosigDiesPrefix(ref Sosig __instance, Damage.DamageClass damClass, Sosig.SosigDeathType deathType)
+{
+    ++SosigHandDropPatch.skip;
+    ++SosigSlotDetachPatch.skip;
+    ++SosigPatch.sosigSetBodyStateSkip;
+    
+    if (sosigDiesSkip > 0)
+    {
+        return;
+    }
+    
+    // Skip if not connected
+    if (Mod.managerObject == null)
+    {
+        return;
+    }
+    
+    // NULL CHECK MUST BE HERE - BEFORE GetComponent!
+    if (__instance == null)
+    {
+        Mod.LogWarning("SosigDiesPrefix: __instance is null");
+        return;
+    }
+    
+    TrackedSosig trackedSosig = GameManager.trackedSosigBySosig.ContainsKey(__instance) ? GameManager.trackedSosigBySosig[__instance] : __instance.GetComponent<TrackedSosig>();
+    
+    if (trackedSosig != null && trackedSosig.data.trackedID != -1)
+    {
+        if (ThreadManager.host)
         {
-            ++SosigHandDropPatch.skip;
-            ++SosigSlotDetachPatch.skip;
-            ++SosigPatch.sosigSetBodyStateSkip;
-
-            if (sosigDiesSkip > 0)
-            {
-                return;
-            }
-
-            // Skip if not connected
-            if (Mod.managerObject == null)
-            {
-                return;
-            }
-
-            TrackedSosig trackedSosig = GameManager.trackedSosigBySosig.ContainsKey(__instance) ? GameManager.trackedSosigBySosig[__instance] : __instance.GetComponent<TrackedSosig>();
-            if (trackedSosig != null && trackedSosig.data.trackedID != -1)
-            {
-                if (ThreadManager.host)
-                {
-                    ServerSend.SosigDies(trackedSosig.data.trackedID, damClass, deathType);
-                }
-                else
-                {
-                    ClientSend.SosigDies(trackedSosig.data.trackedID, damClass, deathType);
-                }
-            }
+            ServerSend.SosigDies(trackedSosig.data.trackedID, damClass, deathType);
         }
-
+        else
+        {
+            ClientSend.SosigDies(trackedSosig.data.trackedID, damClass, deathType);
+        }
+    }
+}
         static void SosigDiesPostfix()
         {
             --SosigHandDropPatch.skip;
@@ -4933,7 +5065,7 @@ namespace H3MP.Patches
             {
                 if (trackedSosig.data.trackedID == -1)
                 {
-                    TrackedSosig.unknownSetIFFs.Add(trackedSosig.data.localWaitingIndex, i);
+                    TrackedSosig.unknownSetIFFs[trackedSosig.data.localWaitingIndex] = i;
                 }
                 else
                 {
@@ -4968,7 +5100,7 @@ namespace H3MP.Patches
             {
                 if (trackedSosig.data.trackedID == -1)
                 {
-                    TrackedSosig.unknownSetOriginalIFFs.Add(trackedSosig.data.localWaitingIndex, i);
+TrackedSosig.unknownSetOriginalIFFs[trackedSosig.data.localWaitingIndex] = i;
                 }
                 else
                 {
@@ -6524,8 +6656,8 @@ namespace H3MP.Patches
 
             List<CodeInstruction> toInsert = new List<CodeInstruction>();
             toInsert.Add(new CodeInstruction(OpCodes.Ldarg_0)); // Load encryption instance
-            toInsert.Add(new CodeInstruction(OpCodes.Ldloc_1)); // Load j
-            toInsert.Add(new CodeInstruction(OpCodes.Ldloc_2)); // Load the newly instantiated GameObject
+            toInsert.Add(new CodeInstruction(OpCodes.Ldloc_3)); // Load j
+            toInsert.Add(new CodeInstruction(OpCodes.Ldloc_S, (byte)4)); // Load GameObject from slot 4
             toInsert.Add(new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(GameObject), "get_transform"))); // Get transform
             toInsert.Add(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(EncryptionPatch), "EncryptionSpawnOnDestroy"))); // Call our method
 
@@ -6534,7 +6666,7 @@ namespace H3MP.Patches
             {
                 CodeInstruction instruction = instructionList[i];
 
-                if (instruction.opcode == OpCodes.Stloc_2)
+                if (instruction.opcode == OpCodes.Stloc_S && instruction.operand is LocalBuilder local && local.LocalIndex == 4)
                 {
                     instructionList.InsertRange(i + 1, toInsert);
                     applied = true;
