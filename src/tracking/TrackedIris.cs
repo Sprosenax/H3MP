@@ -1,0 +1,96 @@
+﻿using FistVR;
+using H3MP.Networking;
+using H3MP.Patches;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace H3MP.Tracking
+{
+    public class TrackedIris : TrackedObject
+    {
+        public Construct_Iris physicalIris;
+        public TrackedIrisData irisData;
+
+        public static Dictionary<uint, List<object[]>> unknownIrisShatter = new Dictionary<uint, List<object[]>>();
+        public static Dictionary<uint, Construct_Iris.IrisState> unknownIrisSetState = new Dictionary<uint, Construct_Iris.IrisState>();
+
+        public override void Awake()
+        {
+            base.Awake();
+
+            CheckReferenceSize();
+            int refIndex = availableTrackedRefIndices[availableTrackedRefIndices.Count - 1];
+            availableTrackedRefIndices.RemoveAt(availableTrackedRefIndices.Count - 1);
+            trackedReferences[refIndex] = this;
+            Construct_Iris.BParamType newParamType = new Construct_Iris.BParamType();
+            newParamType.Mats = new List<MatBallisticType>();
+            newParamType.Pen = refIndex;
+            GetComponent<Construct_Iris>().BParams.Add(newParamType);
+        }
+
+        public override bool HandleShatter(UberShatterable shatterable, Vector3 point, Vector3 dir, float intensity, bool received, int clientID, byte[] data)
+        {
+            if (received)
+            {
+                ++UberShatterableShatterPatch.skip;
+                physicalIris.Rings[data[0]].Shatter(point, dir, intensity);
+                --UberShatterableShatterPatch.skip;
+
+                if (ThreadManager.host)
+                {
+                    ServerSend.UberShatterableShatter(irisData.trackedID, point, dir, intensity, data, clientID);
+                }
+            }
+            else
+            {
+                int index = -1;
+                for(int i=0; i< physicalIris.Rings.Count; ++i)
+                {
+                    if (physicalIris.Rings[i] == shatterable)
+                    {
+                        index = i;
+                        break;
+                    }
+                }
+
+                if(index > -1)
+                {
+                    data = new byte[] { (byte)index };
+
+                    if (ThreadManager.host)
+                    {
+                        ServerSend.UberShatterableShatter(irisData.trackedID, point, dir, intensity, data);
+                    }
+                    else if (irisData.trackedID != -1)
+                    {
+                        ClientSend.UberShatterableShatter(irisData.trackedID, point, dir, intensity, data);
+                    }
+                }
+                else
+                {
+                    Mod.LogError("Iris HandleShatter, could not find shatterable in rings");
+                }
+            }
+
+            return true;
+        }
+
+        protected override void OnDestroy()
+        {
+            // A skip of the entire destruction process may be used if H3MP has become irrelevant, like in the case of disconnection
+            if (skipFullDestroy)
+            {
+                return;
+            }
+
+            // Remove from tracked lists, which has to be done no matter what OnDestroy because we will not have the physical object anymore
+            GameManager.trackedIrisByIris.Remove(physicalIris);
+            for (int i = 0; i < physicalIris.Rings.Count; ++i)
+            {
+                GameManager.trackedObjectByShatterable.Remove(physicalIris.Rings[i]);
+            }
+
+            base.OnDestroy();
+        }
+    }
+}
